@@ -2,3 +2,7 @@
 /runs/
 /D2/
 /files/
+dataset/
+logs/
+.vscode/
+.ipynb_checkpoints/

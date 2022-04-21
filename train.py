@@ -1,98 +1,140 @@
 import sys
 import torch
-import datetime
 import numpy as np
 import torch.nn as nn
-from utils.fit import fit
+from utils.trainer import *
 from utils.retinet import QRetiNet
-from utils.data import create_data
-from utils.settings import Settings
+from utils.data import loaders
 from torchsummary import summary
-from matplotlib import pyplot as plt
 from utils.utils import create_dir, seeding
+from utils.swin_transformer import SwinTransformer
 from torch.optim.lr_scheduler import StepLR
 import torchmetrics.functional as M
+import os
+import configparser
+import logging
+
+
 def main():
     """ Seeding """
     seeding(42)
-    """ Configuration parameters """
-    settings = Settings()
-    dataset_dir = settings.dataset_dir
-    lr = settings.learning_rate
-    batch_size = settings.batch_size
-    num_epochs = settings.epochs
-    image_size = settings.image_size
-    checkpoint_path = "checkpoints/" + datetime.datetime.now().strftime("%d_%H-%M_QRetiNet/")
-    gpus_ids = settings.gpus_ids
-    step_sch = num_epochs * 0.15
-    gamma_sch = 0.8
-    train_dir = dataset_dir + '/train/'
-    val_dir = dataset_dir + '/val/'
-    """ Directories """
-    create_dir("files")
-    create_dir("checkpoints")
+    config = configparser.ConfigParser()
+    config.read('configs/qretinet.ini')
+    paths = config['PATHS']
+    hyperparameters = config['HYPERPARAMETERS']
+    general = config['GENERAL']
+    """
+    Directories
+    """
+    ver_ = 0
+    while(os.path.exists(f"logs/version{ver_}/")):
+        ver_ += 1
+    version = f"logs/version{ver_}/"
+    checkpoint_path = version + "checkpoints/"
     create_dir(checkpoint_path)
-    """ CUDA device """
-    device = torch.device("cuda")
-    """ Dataset and loader """
-    train_loader, val_loader = create_data(dataset_dir, image_size, batch_size)
+    with open(version + 'config.txt', 'w') as configfile:
+        config.write(configfile)
+    """
+    logging
+    """
+    logging.basicConfig(filename=version + "log.log",
+                        filemode='a',
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.INFO)
+    logger = logging.getLogger()
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(stdout_handler)
+    """ 
+    Hyperparameters 
+    """
+    batch_size = hyperparameters.getint('batch_size')
+    num_epochs = hyperparameters.getint('num_epochs')
+    lr = hyperparameters.getfloat('lr')
+    B1 = hyperparameters.getfloat('B1')
+    B2 = hyperparameters.getfloat('B2')
+    weight_decay = hyperparameters.getfloat('weight_decay')
+    gpus_ids = [0]
+    """
+    Paths
+    """
+    train_imgdir = paths.get('train_imgdir')
+    val_imgdir = paths.get('val_imgdir')
+    """
+    General settings
+    """
+    n_classes = general.getint('n_classes')
+    img_size = general.getint('img_size')
+    device = torch.device(f"cuda" if torch.cuda.is_available() else 'cpu')
+    """ 
+    Getting loader
+    """
+    train_loader, val_loader = loaders(train_imgdir, val_imgdir, img_size, batch_size)
+    iter_plot_img = len(val_loader) * 10
     """ Building model """
-    model = QRetiNet()
+    # model = QRetiNet(n_classes=n_classes)  # create object model
+    model = SwinTransformer(
+    hidden_dim=48,
+    layers=(2, 2, 2, 2),
+    heads=(3, 6, 12, 24),
+    channels=3,
+    num_classes=2,
+    head_dim=32,
+    window_size=7,
+    downscaling_factors=(4, 2, 2, 2),
+    relative_pos_embedding=True
+    )
     model = model.to(device)
-    summary(model, input_size=(3, image_size, image_size), batch_size=batch_size)
-    model = nn.DataParallel(model, device_ids=gpus_ids)
+
+    summary(model, input_size=(3, img_size, img_size), batch_size=-1)
+    name_model = model.__name__
     pytorch_total_params = sum(p.numel() for p in model.parameters())
-    """ Prepare training """
-    optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+    if len(gpus_ids) > 1:
+        print("Data parallel...")
+        model = nn.DataParallel(model, device_ids=gpus_ids)
+    """ 
+    Prepare training 
+    """
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay, betas=(B1, B2))
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=B1)
     loss_fn = nn.CrossEntropyLoss()
-    scheduler = StepLR(optimizer=optimizer, step_size=step_sch, gamma=gamma_sch)
-    scaler = torch.cuda.amp.GradScaler()
-    # metric = M.accuracy()
-    """ Save params """
-    with open(checkpoint_path + "LOGS.txt", "w") as text_file:
-        text_file.write(f"Learning rate: {lr}\n")
-        text_file.write(f"Epochs: {num_epochs}\n")
-        text_file.write(f"Scheduler step, gamma: {step_sch, gamma_sch}\n")
-        text_file.write(f"Batch size: {batch_size}\n")
-        text_file.write(f"No. of Parameters: {pytorch_total_params}\n")
-        text_file.write(f"No. of GPUs: {len(gpus_ids)}\n")
-        text_file.close()
-    """ Training the model """
-    fit(num_epochs=num_epochs, train_loader=train_loader, val_loader=val_loader,
-        model=model, optimizer=optimizer, loss_fn=loss_fn,
-        scheduler=scheduler,
-        scaler=scaler, device=device, checkpoint_path=checkpoint_path)
-
-    """ Saving numpy history """
-    hist_train_loss = np.load(checkpoint_path + 'hist_train_loss.npy')
-    hist_val_loss = np.load(checkpoint_path + 'hist_val_loss.npy')
-    hist_train_acc = np.load(checkpoint_path + 'hist_train_acc.npy')
-    hist_val_acc = np.load(checkpoint_path + 'hist_val_acc.npy')
-    x = np.arange(1, len(hist_train_loss) + 1)
-
-    with open(checkpoint_path + "results.txt", "w") as ff:
-        ff.write(f"Best Train Loss: {np.min(hist_train_loss):0.4f}, Best Val Loss:{np.min(hist_val_loss):0.4f},\n "
-                 f"Best Train IoU:{np.max(hist_train_acc):0.4f}, Best Val IoU:{np.max(hist_val_acc):0.4f}\n")
-
-    plt.figure()
-    plt.plot(x, hist_train_loss)
-    plt.plot(x, hist_val_loss)
-    plt.title("QRetiNet Loss")
-    plt.grid(color='lightgray', linestyle='-', linewidth=2)
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Validation'], loc='best')
-    plt.savefig(checkpoint_path + "loss.png")
-
-    plt.figure()
-    plt.plot(x, hist_train_acc)
-    plt.plot(x, hist_val_acc)
-    plt.title("QRetiNet Accuracy")
-    plt.grid(color='lightgray', linestyle='-', linewidth=2)
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Validation'], loc='best')
-    plt.savefig(checkpoint_path + "IoU.png")
+    scheduler = StepLR(optimizer=optimizer, step_size=num_epochs * 0.1, gamma=0.8)
+    logger.info(f'Total_params:{pytorch_total_params}')
+    """ 
+    Trainer
+    """
+    # for idx, m in enumerate(model.modules()):
+    #     print(idx, '->', m)
+    #     if idx == 109:
+    #         layer = m
+    #         print(layer)
+    #         # break
+    # sys.exit()
+    logger.info('**********************************************************')
+    logger.info('**************** Initialization sucessful ****************')
+    logger.info('**********************************************************')
+    logger.info('--------------------- Start training ---------------------')
+    trainer(num_epochs=num_epochs,
+            train_loader=train_loader,
+            val_loader=val_loader,
+            model=model,
+            optimizer=optimizer,
+            loss_fn=loss_fn,
+            metric=None,
+            device=device,
+            checkpoint_path=checkpoint_path,
+            scheduler=scheduler,
+            iter_plot_img=int(num_epochs * 0.1),
+            name_model=name_model,
+            callback_stop_value=int(num_epochs * 0.15),
+            tb_dir=version,
+            logger=logger
+            )
+    logger.info('-------------------- Finished Train ---------------------')
+    logger.info('******************* Start evaluation  *******************')
+    load_best_model = torch.load(checkpoint_path + 'model.pth')
+    loss_eval, acc_eval = eval(load_best_model, val_loader, loss_fn, device)
+    logger.info([loss_eval, acc_eval])
 
 if __name__ == '__main__':
     main()

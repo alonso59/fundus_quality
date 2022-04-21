@@ -14,7 +14,7 @@ from utils.dataset import OctDataset
 import albumentations as T
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader
-from utils.fit import validation
+from utils.trainer import validation
 import sys
 from utils.loss import DiceLoss
 from torchsummary import summary

@@ -9,7 +9,7 @@ from torchsummary import summary
 from utils.utils import create_dir
 from utils.data import create_data
 from utils.settings import Settings
-from utils.fit import fit, validation
+from utils.trainer import fit, validation
 from matplotlib import pyplot as plt
 from torch.optim.lr_scheduler import StepLR
 from ax.service.managed_loop import optimize
