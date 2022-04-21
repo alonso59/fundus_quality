@@ -197,7 +197,7 @@ def tb_save_images_figures(net, loader, writer, step, device):
     # Build confusion matrix
     cf_matrix = confusion_matrix(y_true, y_pred)
     df_cm = pd.DataFrame(cf_matrix, index=[i for i in classes],
-                         columns=[i for i in classes], dtype=np.uint16
+                         columns=[i for i in classes], dtype=str
                         )
     plt.figure()
     writer.save_figure('Confusion Matrix',sn.heatmap(df_cm, annot=True).get_figure(), step)
