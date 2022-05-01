@@ -70,20 +70,19 @@ def main():
     Getting loader
     """
     train_loader, val_loader = loaders(train_imgdir, val_imgdir, img_size, batch_size)
-    iter_plot_img = len(val_loader) * 10
     """ Building model """
-    # model = QRetiNet(n_classes=n_classes)  # create object model
-    model = SwinTransformer(
-    hidden_dim=48,
-    layers=(2, 2, 2, 2),
-    heads=(3, 6, 12, 24),
-    channels=3,
-    num_classes=2,
-    head_dim=32,
-    window_size=7,
-    downscaling_factors=(4, 2, 2, 2),
-    relative_pos_embedding=True
-    )
+    model = QRetiNet(n_classes=n_classes)  # create object model
+    # model = SwinTransformer(
+    # hidden_dim=48,
+    # layers=(2, 2, 2, 2),
+    # heads=(3, 6, 12, 24),
+    # channels=3,
+    # num_classes=2,
+    # head_dim=32,
+    # window_size=7,
+    # downscaling_factors=(4, 2, 2, 2),
+    # relative_pos_embedding=True
+    # )
     model = model.to(device)
 
     summary(model, input_size=(3, img_size, img_size), batch_size=-1)
@@ -110,6 +109,7 @@ def main():
     #         print(layer)
     #         # break
     # sys.exit()
+
     logger.info('**********************************************************')
     logger.info('**************** Initialization sucessful ****************')
     logger.info('**********************************************************')

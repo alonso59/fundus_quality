@@ -48,22 +48,14 @@ class TensorboardWriter():
     def save_text(self, text):
         self.writer.add_text('Logs', text)
 
-def image_tensorboard(img, device):
-    img_rgb = torch.zeros(img.size(), device=device)
-    img_rgb = torch.div(img, img.max().item())
-    return img_rgb
 
 def grad_cam(model, layer_target, input_tensor, device):
-    # try:
-    #     cam = GradCAM(model, layer_target, use_cuda=True)
-    # except:
-    cam = GradCAM(model, layer_target, use_cuda=True, reshape_transform=reshape_transform)
-    rgb = input_tensor.detach().cpu()
-    grayscale_cam = cam(input_tensor=rgb.unsqueeze(0), targets=None)
+    # cam = GradCAM(model, layer_target, use_cuda=True, reshape_transform=reshape_transform)
+    cam = GradCAM(model, layer_target, use_cuda=True)
+    grayscale_cam = cam(input_tensor=input_tensor, targets=None)
     grayscale_cam = grayscale_cam[0, :]
-    visualization = show_cam_on_image(rgb.numpy().transpose(1, 2, 0), grayscale_cam, use_rgb=True)
+    visualization = show_cam_on_image(input_tensor.squeeze(0).detach().cpu().numpy().transpose(1, 2, 0), grayscale_cam, use_rgb=True)
     vis_img = np.array(Image.fromarray(visualization).convert('RGB')) / 255.
-    
     vis_tensor = torch.tensor(vis_img, dtype=torch.float, device=device)
     return vis_tensor
 

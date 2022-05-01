@@ -6,3 +6,4 @@ dataset/
 logs/
 .vscode/
 .ipynb_checkpoints/
+qualiti-retina-dataset/*

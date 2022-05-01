@@ -3,8 +3,8 @@ import os
 from sklearn.model_selection import train_test_split
 import shutil
 
-source = 'dataset/data'
-dest = 'dataset/'
+source = 'dataset/QUALITY_2021_ABRAHAM'
+dest = 'dataset/new/'
 
 os.makedirs(dest+'train/0')
 os.makedirs(dest+'train/1')
