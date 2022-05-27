@@ -50,8 +50,8 @@ class TensorboardWriter():
 
 
 def grad_cam(model, layer_target, input_tensor, device):
-    # cam = GradCAM(model, layer_target, use_cuda=True, reshape_transform=reshape_transform)
-    cam = GradCAM(model, layer_target, use_cuda=True)
+    cam = GradCAM(model, layer_target, use_cuda=True, reshape_transform=reshape_transform)
+    # cam = GradCAM(model, layer_target, use_cuda=True)
     grayscale_cam = cam(input_tensor=input_tensor, targets=None)
     grayscale_cam = grayscale_cam[0, :]
     visualization = show_cam_on_image(input_tensor.squeeze(0).detach().cpu().numpy().transpose(1, 2, 0), grayscale_cam, use_rgb=True)

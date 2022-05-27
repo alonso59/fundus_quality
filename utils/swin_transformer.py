@@ -3,6 +3,7 @@ from torch import nn, einsum
 import numpy as np
 from einops import rearrange, repeat
 from torchsummary import summary
+import copy
 
 class CyclicShift(nn.Module):
     def __init__(self, displacement):
@@ -231,7 +232,10 @@ class SwinTransformer(nn.Module):
 
 
 def swin_t(hidden_dim=96, layers=(2, 2, 6, 2), heads=(3, 6, 12, 24), **kwargs):
-    return SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
+    model = SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
+    return model
+
+
 
 def test():
     net = SwinTransformer(

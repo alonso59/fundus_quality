@@ -3,8 +3,8 @@ import os
 from sklearn.model_selection import train_test_split
 import shutil
 
-source = 'dataset/QUALITY_2021_ABRAHAM'
-dest = 'dataset/new/'
+source = 'dataset/D4'
+dest = 'dataset/d4new/'
 
 os.makedirs(dest+'train/0')
 os.makedirs(dest+'train/1')
@@ -12,10 +12,10 @@ os.makedirs(dest+'val/0')
 os.makedirs(dest+'val/1')
 
 
-path0_train = dest + 'train/0'
-path1_train = dest + 'train/1'
-path0_val = dest + 'val/0'
-path1_val = dest + 'val/1'
+path0_train = dest + 'train/0/'
+path1_train = dest + 'train/1/'
+path0_val = dest + 'val/0/'
+path1_val = dest + 'val/1/'
 
 x = []
 y = []

@@ -1,7 +1,7 @@
 import torch
 import math
 from tqdm import tqdm
-from utils.callbacks import TensorboardWriter
+from callbacks import TensorboardWriter
 from decimal import Decimal
 import datetime
 from torchmetrics import Accuracy
@@ -29,7 +29,9 @@ def trainer(num_epochs,
             name_model,
             callback_stop_value,
             tb_dir,
-            logger
+            logger,
+            layer,
+            is_inception
             ):
     """ Create log interface """
     writer = TensorboardWriter(metric=metric, name_dir=tb_dir + 'tb_' + name_model + '/')
@@ -38,8 +40,7 @@ def trainer(num_epochs,
     stop_early = 0
     best_valid_loss = float("inf")
 
-    img_sample, _ = next(iter(val_loader))
-    input = img_sample[5, :, :, :].float().to(device)
+    img_sample, labels = next(iter(val_loader))
 
     for epoch in range(num_epochs):
         lr_ = optimizer.param_groups[0]["lr"]
@@ -51,14 +52,15 @@ def trainer(num_epochs,
                                                         optimizer,
                                                         loss_fn,
                                                         iter_num,
-                                                        device
+                                                        device,
+                                                        is_inception
                                                         )
 
         scheduler.step()
-
-        if epoch % 10 == 0:
+        pick0 = np.random.randint(0, len(img_sample))
+        if epoch % 5 == 0:
             print('Saving examples in TensorBoard....')
-            tb_save_images_figures(model, input, writer, epoch, device)
+            tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, epoch, device, layer)
 
         val_loss, val_metric, iter_val = validation(model, val_loader, loss_fn, writer, iter_val, device)
 
@@ -83,12 +85,12 @@ def trainer(num_epochs,
         logger.info(str_print)
     print('Finishing train....')
     load_best_model = torch.load(checkpoint_path + 'model.pth')
-    tb_save_images_figures(load_best_model, input, writer, epoch+1, device)
+    tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, 0, device, layer)
     tb_save_CM_roc_auc(model, val_loader, writer, device)
     
 
 
-def train(loader, model, writer, optimizer, loss_fn, iter_num, device):
+def train(loader, model, writer, optimizer, loss_fn, iter_num, device, is_inception):
     train_loss = 0.0
     train_iou = 0.0
     loop = tqdm(loader, ncols=120)
@@ -98,9 +100,17 @@ def train(loader, model, writer, optimizer, loss_fn, iter_num, device):
         x = x.type(torch.float).to(device)
         y = y.type(torch.long).to(device)
         # forward
-        y_pred = model(x)
+        # ------------ inception ------------
+        if is_inception :
+            y_pred, aux_outputs = model(x)
+            loss1 = loss_fn(y_pred, y)
+            loss2 = loss_fn(aux_outputs, y)
+            loss = loss1 + 0.4*loss2
+        # ------------ inception ------------
+        else:
+            y_pred = model(x)
+            loss = loss_fn(y_pred, y)
         m0 = acc(y_pred.detach().cpu(), y.detach().cpu())
-        loss = loss_fn(y_pred, y)
         # backward
         optimizer.zero_grad()
         loss.backward()
@@ -127,9 +137,9 @@ def validation(model, loader, loss_fn, writer, iter_val, device):
         for batch_idx, (x, y) in enumerate(loop):
             x = x.type(torch.float).to(device)
             y = y.type(torch.long).to(device)
-            y_pred = model(x)
-            loss = loss_fn(y_pred, y)
+            y_pred= model(x)
             m0 = acc(y_pred.detach().cpu(), y.detach().cpu())
+            loss = loss_fn(y_pred, y)
             # accumulate metrics and loss items
             valid_iou += m0.item()
             valid_loss += loss.item()
@@ -164,13 +174,14 @@ def eval(model, loader, loss_fn, device):
     return eval_loss / len(loader), eval_metric / len(loader)
 
 
-def tb_save_images_figures(net, img, writer, step, device):
+def tb_save_images_figures(net, img, writer, step, device, layer):
+    net.eval()
     pred = net(img.unsqueeze(0))  # Feed Network
     pred = (torch.max(torch.exp(pred), 1)[1]).data.cpu().numpy()
-    layer = [net.layers.conv6]
     writer.save_img_preds(net, layer, img.unsqueeze(0), pred, step, device)
 
 def tb_save_CM_roc_auc(net, loader, writer, device):
+    net.eval()
     y_pred = []  # save predction
     y_true = []  # save ground truth
     loop = tqdm(loader, ncols=120)
