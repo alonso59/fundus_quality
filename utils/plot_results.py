@@ -46,7 +46,7 @@ def plot_2D(X, Y, C, labelx, labely, labelc, color_map, name, tickss=None, shrin
     plt.savefig(name + '.png')
 
 
-def plot_norm_data(array, name, factor, xlim):
+def plot_norm_data(array, name, factor, xlim, maxim):
     array.sort()
     hmean = np.mean(array)
     hstd = np.std(array)
@@ -59,21 +59,21 @@ def plot_norm_data(array, name, factor, xlim):
     pdf1 = 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-(x1 - mu)**2 / (2 * sigma**2))
     pdf2 = 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-(x2 - mu)**2 / (2 * sigma**2))
     pdf = stats.norm.pdf(array, hmean, hstd)
-    arran = np.linspace(0, np.max(array), num=(100))
-    plt.figure(figsize=(12, 8), dpi=96)
-    plt.plot(array, pdf * factor, label=f'Mean:{hmean:0.3f}, Std:{hstd:0.3f}, Q1:{q1:0.3f}, Q3:{q3:0.3f}')
+    arran = np.linspace(0, maxim, num=(100))
+    plt.figure(figsize=(6, 4), dpi=96)
+    plt.plot(array, pdf * factor, label=f'Mean:{hmean:0.3f}, Std:{hstd:0.3f}, Q1:{q1:0.3f}, Q3:{q3:0.3f}', linewidth=3)
     n, bins, patches = plt.hist(array, bins=arran, edgecolor='black', density=False)
     plt.fill_between(x1, pdf1 * factor, 0, alpha=.6, color='green')
     plt.fill_between(x2, pdf2 * factor, 0, alpha=.6, color='green')
 
-    plt.xlabel(name, fontweight="bold", fontsize=14)
-    plt.ylabel('No. Images', fontweight="bold", fontsize=14)
-    plt.legend(loc='best', fontsize=12)
+    plt.xlabel(name, fontweight="bold", fontsize=12)
+    plt.ylabel('No. Images', fontweight="bold", fontsize=12)
+    plt.legend(loc='best', fontsize=11)
     plt.xlim(xlim)
     plt.savefig(name + '.png')
 
 def k_means():
-    path = 'kaggle_new_label.csv'
+    path = 'csv/kaggle_new_label.csv'
     csv1 = pd.read_csv(path)
     csv1 = csv1.sample(frac=1).reset_index(drop=True)
     SNR = csv1['SNR'].to_numpy()
@@ -157,7 +157,7 @@ def k_means():
     return labels_kmeans
 
 def multilabel_cfmatrix():
-    path = 'kaggle_new_label.csv'
+    path = 'csv/kaggle_new_label.csv'
     csv1 = pd.read_csv(path)
     csv1 = csv1.sample(frac=1).reset_index(drop=True)
     LABEL = csv1['Qlabel'].to_numpy()
@@ -218,7 +218,7 @@ def multilabel_cfmatrix():
                 y_true.append(4)
             if labels_kemeans[i] == 1:
                 y_true.append(9)
-
+    y_true = y_pred
     cfm = confusion_matrix(y_pred, y_true)
 
     ## Get Class Labels
@@ -236,7 +236,7 @@ def multilabel_cfmatrix():
     ax.xaxis.set_ticklabels(class_names, fontsize = 14)
     ax.xaxis.tick_bottom()
     ax.yaxis.set_ticklabels(class_names, fontsize = 14)
-    ax.set_xlabel('KMeans label', fontsize=20, fontweight="bold")
+    ax.set_xlabel('CNN label', fontsize=20, fontweight="bold")
     ax.set_ylabel('CNN label', fontsize=20, fontweight="bold")
     plt.savefig('test_cfmatrix.png')
 
@@ -283,7 +283,7 @@ def plot_hist3d():
     plt.savefig('images/hist_label_DR.png')
 
 def main():
-    path = 'test.csv'
+    path = 'csv/kaggle_new_reduced.csv'
     csv1 = pd.read_csv(path)
     csv1 = csv1.sample(frac=1).reset_index(drop=True)
     SNR = csv1['SNR'].to_numpy()
@@ -340,15 +340,15 @@ def main():
     # plot_2D(snr, contrast, label, 'SNR', 'CONTRAST', 'CNNLABEL', cm.Blues, 'images/SNR_CONTRAST_CNNLABEL', tickss=range(2), shrink=0.2, aspect=2)
     # plot_2D(blur, contrast, label, 'BLUR', 'CONTRAST', 'CNNLABEL', cm.Blues, 'images/BLUR_CONTRAST_CNNLABEL', tickss=range(2), shrink=0.2, aspect=2)   
 
-    # plot_norm_data(BRISQUE, 'BRSIQUE', 50000, [20, 100])
-    # plot_norm_data(SNR, 'SNR', 800, [0.5, 2])
-    # plot_norm_data(BRIGHT, 'BRIGHTNESS', 65000, [0, 130])
-    # plot_norm_data(CONTRAST, 'CONTRAST', 300, [0, 1])
-    # plot_norm_data(BLUR, 'BLUR', 20000, [0, 30])
+    plot_norm_data(BRISQUE, 'BRSIQUE', 50000, [20, 100], np.max(BRISQUE))
+    plot_norm_data(SNR, 'SNR', 800, [0.5, 2], np.max(SNR))
+    plot_norm_data(BRIGHT, 'BRIGHTNESS', 65000, [0, 130], np.max(BRIGHT))
+    plot_norm_data(CONTRAST, 'CONTRAST', 300, [0, 1], np.max(CONTRAST))
+    plot_norm_data(BLUR, 'BLUR', 20000, [0, 30], np.max(BLUR))
 
-    k_means()
+    # k_means()
 
     # plot_hist3d()
 
 if __name__ == '__main__':
-    multilabel_cfmatrix()
+    main()
