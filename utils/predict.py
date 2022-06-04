@@ -8,6 +8,7 @@ import argparse
 from tqdm import tqdm
 import pandas as pd
 import sys
+from time import time
 
 def get_filenames(path, ext):
     X0 = []
@@ -32,7 +33,11 @@ def predict(file_model, img_file, img_size):
     image = img.transpose(2, 0, 1)
     image = np.expand_dims(image, axis=0)
     image = torch.tensor(image, device='cuda', dtype=torch.float)
+    start = time()
     pred = model(image)
+    stop = time()
+    et = stop - start
+    print('[Elapsed time]: '+ str(et) + ' s')
     pred = torch.softmax(pred, dim=1)
     pred = torch.argmax(pred).detach().cpu().numpy()
     return pred
@@ -56,6 +61,10 @@ def main():
     
     save_csv(csvfile, pred)
 
+def single():
+
+    predict('logs/version10/checkpoints/model.pth', 'dataset/D2/val/1/11900_right.jpeg' , 224)
+
 
 if __name__ == '__main__':
-    main()
+    single()

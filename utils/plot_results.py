@@ -9,7 +9,7 @@ from sklearn.metrics import cohen_kappa_score as kappa
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import multilabel_confusion_matrix
-
+import matplotlib
 def plot_3D(X, Y, Z, C, labelx, labely, labelz, labelc, color_map, name):
     size = 50
     norm = Normalize()
@@ -19,9 +19,9 @@ def plot_3D(X, Y, Z, C, labelx, labely, labelz, labelc, color_map, name):
     fig.set_dpi(128)
     ax1 = fig.add_subplot(111, projection='3d')
     ax1.scatter3D(X, Y, Z, facecolors=color_map(norm(C)), s=size, edgecolor='black')
-    ax1.set_xlabel(labelx, fontweight="bold", fontsize=14)
-    ax1.set_ylabel(labely, fontweight="bold", fontsize=14)
-    ax1.set_zlabel(labelz, fontweight="bold", fontsize=14)
+    ax1.set_xlabel(labelx, fontweight="bold", fontsize=16, labelpad=20)
+    ax1.set_ylabel(labely, fontweight="bold", fontsize=16, labelpad=20)
+    ax1.set_zlabel(labelz, fontweight="bold", fontsize=16, labelpad=10)
     m1 = cm.ScalarMappable(cmap=color_map)
     m1.set_array(C)
     cbar = fig.colorbar(m1, shrink=0.5, aspect=12)
@@ -30,21 +30,23 @@ def plot_3D(X, Y, Z, C, labelx, labely, labelz, labelc, color_map, name):
 
 
 def plot_2D(X, Y, C, labelx, labely, labelc, color_map, name, tickss=None, shrink=1, aspect=12):
-    size = 50
+    size = 40
     norm = Normalize()
     fig = plt.figure()
+    plt.style.use('seaborn-dark')
     fig.set_figheight(6)
-    fig.set_figwidth(12)
+    fig.set_figwidth(10)
     fig.set_dpi(96)
-    plt.scatter(X, Y, facecolors=color_map(norm(C)), s=size, edgecolor='black', )
-    plt.xlabel(labelx, fontweight="bold", fontsize=14)
-    plt.ylabel(labely, fontweight="bold", fontsize=14)
-    m = cm.ScalarMappable(cmap=color_map)
-    m.set_array(C)
-    cbar = fig.colorbar(m, shrink=shrink, aspect=aspect, ticks=tickss)
-    cbar.set_label(labelc, fontsize=14, fontweight="bold")
+    plt.grid(color='gray', linestyle='--', linewidth=0.8)
+    # plt.scatter(X, Y, facecolors=color_map(norm(C)), s=size, edgecolor='black', )
+    plt.scatter(X, Y, c='blue', s=size, edgecolor='black')
+    plt.xlabel(labelx, fontweight="bold", fontsize=20)
+    plt.ylabel(labely, fontweight="bold", fontsize=20)
+    # m = cm.ScalarMappable(cmap=color_map)
+    # m.set_array(C)
+    # cbar = fig.colorbar(m, shrink=shrink, aspect=aspect, ticks=tickss)
+    # cbar.set_label(labelc, fontsize=14, fontweight="bold")
     plt.savefig(name + '.png')
-
 
 def plot_norm_data(array, name, factor, xlim, maxim):
     array.sort()
@@ -59,16 +61,16 @@ def plot_norm_data(array, name, factor, xlim, maxim):
     pdf1 = 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-(x1 - mu)**2 / (2 * sigma**2))
     pdf2 = 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-(x2 - mu)**2 / (2 * sigma**2))
     pdf = stats.norm.pdf(array, hmean, hstd)
-    arran = np.linspace(0, maxim, num=(100))
-    plt.figure(figsize=(6, 4), dpi=96)
-    plt.plot(array, pdf * factor, label=f'Mean:{hmean:0.3f}, Std:{hstd:0.3f}, Q1:{q1:0.3f}, Q3:{q3:0.3f}', linewidth=3)
+    arran = np.linspace(0, maxim, num=(70))
+    plt.figure(figsize=(10, 6), dpi=96)
+    plt.grid(color='gray', linestyle='--', linewidth=0.8)
+    plt.plot(array, pdf * factor, label=f'Mean: {hmean:0.3f}\nStd: {hstd:0.3f}\nQ1: {q1:0.3f}\nQ3: {q3:0.3f}', linewidth=3)
     n, bins, patches = plt.hist(array, bins=arran, edgecolor='black', density=False)
-    plt.fill_between(x1, pdf1 * factor, 0, alpha=.6, color='green')
-    plt.fill_between(x2, pdf2 * factor, 0, alpha=.6, color='green')
-
-    plt.xlabel(name, fontweight="bold", fontsize=12)
-    plt.ylabel('No. Images', fontweight="bold", fontsize=12)
-    plt.legend(loc='best', fontsize=11)
+    plt.fill_between(x1, pdf1 * factor, 0, alpha=.4, color='green')
+    plt.fill_between(x2, pdf2 * factor, 0, alpha=.4, color='green')
+    plt.xlabel(name, fontweight="bold", fontsize=20)
+    plt.ylabel('No. Images', fontweight="bold", fontsize=20)
+    plt.legend(loc='best', fontsize=16)
     plt.xlim(xlim)
     plt.savefig(name + '.png')
 
@@ -283,7 +285,7 @@ def plot_hist3d():
     plt.savefig('images/hist_label_DR.png')
 
 def main():
-    path = 'csv/kaggle_new_reduced.csv'
+    path = 'csv/public_datasets.csv'
     csv1 = pd.read_csv(path)
     csv1 = csv1.sample(frac=1).reset_index(drop=True)
     SNR = csv1['SNR'].to_numpy()
@@ -291,7 +293,7 @@ def main():
     CONTRAST = csv1['Contrast'].to_numpy()
     BRISQUE = csv1['Brisque'].to_numpy()
     BRIGHT = csv1['Brightness'].to_numpy()
-    LABEL = csv1['Qlabel'].to_numpy()
+    # LABEL = csv1['Qlabel'].to_numpy()
     # DR = csv1['DR'].to_numpy()
     n = 4000
     snr = []
@@ -300,7 +302,8 @@ def main():
     brig = []
     bris = []
     label = []
-
+    matplotlib.rcParams.update({'font.size': 16})
+    np.random.seed(10)
     for i in range(n):
         pick = np.random.randint(0, SNR.shape[0])
         snr.append(SNR[pick])  # C
@@ -308,7 +311,7 @@ def main():
         contrast.append(CONTRAST[pick] ) # SNR
         brig.append(BRIGHT[pick] ) # BRISQUE
         bris.append(BRISQUE[pick] ) # BRISQUE
-        label.append(LABEL[pick] ) # QUALITY LABEL
+        # label.append(LABEL[pick] ) # QUALITY LABEL
     # k = 0
     # for i in range(DR.shape[0]):
     #     if DR[i] == 0:
@@ -324,27 +327,32 @@ def main():
     #         break
     # print(len(np.array(blur)))
     # ndim = np.array(snr).shape[0]
-    # plot_3D(np.array(snr), np.array(blur), np.array(contrast), np.array(bris), 'SNR', 'BLUR', 'CONTRAST', 'BRISQUE', cm.jet_r, 'images/BRISQUE4D')
+    
+    # plot_3D(np.array(snr), np.array(blur), np.array(contrast), np.array(bris), 'SNR', '  BLUR', 'CONTRAST', 'BRISQUE', cm.jet_r, 'images/BRISQUE4D')
     # plot_3D(snr, blur, contrast, brig, 'SNR', 'BLUR', 'CONTRAST', 'BRIGHTNESS', cm.YlOrBr_r, 'images/BRIGHTNESS4D')
     # plot_3D(snr, blur, contrast, label, 'SNR', 'BLUR', 'CONTRAST', 'CNN LABEL', cm.Blues, 'images/CNNLABEL4D')
 
     # plot_2D(snr, blur, bris, 'SNR', 'BLUR', 'BRISQUE', cm.jet_r, 'images/SNR_BLUR_BRISQUE')
     # plot_2D(snr, contrast, bris, 'SNR', 'CONTRAST', 'BRISQUE', cm.jet_r, 'images/SNR_CONTRAST_BRISQUE')
     # plot_2D(blur, contrast, bris, 'BLUR', 'CONTRAST', 'BRISQUE', cm.jet_r, 'images/BLUR_CONTRAST_BRISQUE')
+    # plot_2D(brig, contrast, bris, 'BRIGHTNESS', 'CONTRAST', 'BRISQUE', cm.jet_r, 'images/BRIGHTNESS_CONTRAST_BRISQUE')
 
     # plot_2D(snr, blur, brig, 'SNR', 'BLUR', 'BRIGHTNESS', cm.YlOrBr_r, 'images/SNR_BLUR_BRIGHTNESS')
     # plot_2D(snr, contrast, brig, 'SNR', 'CONTRAST', 'BRIGHTNESS', cm.YlOrBr_r, 'images/SNR_CONTRAST_BRIGHTNESS')
     # plot_2D(blur, contrast, brig, 'BLUR', 'CONTRAST', 'BRIGHTNESS', cm.YlOrBr_r, 'images/BLUR_CONTRAST_BRIGHTNESS')
+    # plot_2D(bris, brig, brig, 'BRISQUE', 'BRIGHTNESS', 'BRIGHTNESS', cm.YlOrBr_r, 'images/BRISQUE_BRIGHTNESS')
 
     # plot_2D(snr, blur, label, 'SNR', 'BLUR', 'CNNLABEL', cm.Blues, 'images/SNR_BLUR_CNNLABEL', tickss=range(2), shrink=0.2, aspect=2)
     # plot_2D(snr, contrast, label, 'SNR', 'CONTRAST', 'CNNLABEL', cm.Blues, 'images/SNR_CONTRAST_CNNLABEL', tickss=range(2), shrink=0.2, aspect=2)
     # plot_2D(blur, contrast, label, 'BLUR', 'CONTRAST', 'CNNLABEL', cm.Blues, 'images/BLUR_CONTRAST_CNNLABEL', tickss=range(2), shrink=0.2, aspect=2)   
 
-    plot_norm_data(BRISQUE, 'BRSIQUE', 50000, [20, 100], np.max(BRISQUE))
-    plot_norm_data(SNR, 'SNR', 800, [0.5, 2], np.max(SNR))
-    plot_norm_data(BRIGHT, 'BRIGHTNESS', 65000, [0, 130], np.max(BRIGHT))
-    plot_norm_data(CONTRAST, 'CONTRAST', 300, [0, 1], np.max(CONTRAST))
-    plot_norm_data(BLUR, 'BLUR', 20000, [0, 30], np.max(BLUR))
+    plot_norm_data(BRISQUE, 'BRSIQUE', 75000, [0, 100], np.max(BRISQUE))
+    plot_norm_data(SNR, 'SNR', 1200, [0, np.max(SNR)], np.max(SNR))
+    plot_norm_data(BRIGHT, 'BRIGHTNESS', 100000, [0, 150], np.max(BRIGHT))
+    plot_norm_data(CONTRAST, 'CONTRAST', 500, [0, 1], np.max(CONTRAST))
+    BLUR.sort()
+    print(np.max(BLUR[:38000]))
+    plot_norm_data(BLUR[:38000], 'BLUR', 45000, [0, 55], 55)
 
     # k_means()
 

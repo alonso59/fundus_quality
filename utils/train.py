@@ -75,31 +75,31 @@ def main():
     # model = models.resnet18(pretrained=True)
     # model = models.vgg13(pretrained=True)
     # model.classifier[6] = nn.Linear(4096, 2)
-    # model = QRetiNet(n_classes=n_classes)  # create object model
+    model = QRetiNet(n_classes=n_classes)  # create object model
     # model = SwinTransformer(
-    # hidden_dim=96,
-    # layers=(2, 2, 6, 2),
-    # heads=(3, 6, 12, 24),
+    # hidden_dim=24,
+    # layers=(2, 2, 2, 2),
+    # heads=(2, 2, 2, 2),
     # channels=3,
     # num_classes=2,
-    # head_dim=16,
+    # head_dim=32,
     # window_size=7,
-    # downscaling_factors=(4, 2, 2, 2),
+    # downscaling_factors=(2, 2, 2, 2),
     # relative_pos_embedding=True
     # )
-    model = swin_t()
-    load = torch.load('pretrain/swint_ep300.pth')
-    model.load_state_dict(load, strict=False)
-    model.mlp_head = nn.Sequential(
-        nn.LayerNorm((768,), eps=1e-05, elementwise_affine=True),
-        nn.Linear(in_features=768, out_features=n_classes, bias=True)
-    )
+    # model = swin_t()
+    # load = torch.load('pretrain/swint_ep300.pth')
+    # model.load_state_dict(load, strict=False)
+    # model.mlp_head = nn.Sequential(
+    #     nn.LayerNorm((768,), eps=1e-05, elementwise_affine=True),
+    #     nn.Linear(in_features=768, out_features=n_classes, bias=True)
+    # )
     # model = nat_nano(pretrained=True, num_classes=2)
     model.to(device)
     # print(model)
     # sys.exit()
     summary(model, input_size=(3, img_size, img_size), batch_size=-1)
-    name_model = 'SwinTiny'
+    name_model = 'DRNet-Q'
     is_inception = False
     pytorch_total_params = sum(p.numel() for p in model.parameters())
     if len(gpus_ids) > 1:
@@ -127,8 +127,8 @@ def main():
     # sys.exit()
     # layer = [model.levels[-1].blocks[-1].norm1]
     # layer = [model.stage4.layers[0][1].mlp_block.fn.norm]
-    # layer = [model.layers.conv8]
-    layer = [model.stage4.layers[0][1].mlp_block.fn.norm]
+    layer = [model.layers.conv8]
+    # layer = [model.stage4.layers[0][1].mlp_block.fn.norm]
     print(layer)
     logger.info('**********************************************************')
     logger.info('**************** Initialization sucessful ****************')
