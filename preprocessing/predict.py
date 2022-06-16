@@ -107,7 +107,7 @@ def predict(model, source, img_size):
     pred = pred.detach().cpu().squeeze(0).squeeze(0).numpy()
     pred = np.round(pred).astype('float')
     pred = Image.fromarray(pred)
-    pred = pred.filter(ImageFilter.MinFilter(3))
+    pred = pred.filter(ImageFilter.MaxFilter(3))
     pred = remove_remaining(pred)
     pred = pred.resize((h, w))
     pred = np.array(pred) / 255.
