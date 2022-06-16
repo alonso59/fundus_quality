@@ -1,0 +1,25 @@
+paths:
+  train_imgdir: 'dataset/D2/train'
+  val_imgdir: 'dataset/D2/val'
+  test_imgdir: 'dataset/D2/test'
+
+hyperparameters:
+  loss_fn: 'cross_entropy'
+  optimizer: 'adam' # sgd
+  batch_size: 128
+  num_epochs: 50
+  lr: 0.001
+  b1: 0.8
+  b2: 0.999
+  weight_decay: 0.0001
+  scheduler: 
+    type: 'step' # cosine, exponential
+    gamma: 0.8
+    step: 5
+  n_gpus: 1
+
+general:
+  model_name: 'DRNet-Q'
+  pretrain: False
+  n_classes: 2
+  img_size: 224
