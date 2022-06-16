@@ -67,7 +67,7 @@ def train(cfg):
     """ 
     Building model 
     """
-    models_class = SegmentationModels(device, in_channels=3, img_size=img_size, n_classes=n_classes)
+    models_class = SegmentationModels(device, in_channels=1, img_size=img_size, n_classes=n_classes)
     model, preprocess_input, name_model = models_class.UNet(feature_start=32, layers=3, kernel_size=3, stride=1, padding=1)
     models_class.summary(logger=logger)
     pytorch_total_params = sum(p.numel() for p in model.parameters())

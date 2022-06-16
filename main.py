@@ -4,7 +4,8 @@ from classification.train import train as clsf_train
 from preprocessing.train import train as pre_train
 from classification.predict import implement as clsf_impl
 from preprocessing.predict import implement as pre_impl
-import cv2
+from PIL import Image
+import numpy as np
 
 def main():
     parser = argparse.ArgumentParser()
@@ -21,7 +22,7 @@ def main():
     mode = opt.mode
 
     if stage == 'implement':
-        implement('dataset/D2/train/1/5559_right.jpeg')
+        implement('dataset/PulbicDatasets/MESSIDOR/20051020_45004_0100_PP.tif')
     elif stage == 'classification':
         if mode == 'train':
             with open(config, "r") as ymlfile:
@@ -40,8 +41,11 @@ def main():
 def implement(source):
     preprocessing_weights = 'pretrain/unet_weights.pth'
     classifier_weights = 'pretrain/drnetq_weights.pth'
-    pred = pre_impl(source, 'unet', preprocessing_weights, 512, 1, 'cuda')
-    cv2.imwrite('test.png', pred)
-    # clsf_impl(image, 'drnetq', classifier_weights, 224, 2, 'cuda')
+    crop, pred = pre_impl(source, 'unet', preprocessing_weights, 512, 1, 'cuda')
+    crop, pred = Image.fromarray(crop), Image.fromarray(pred)
+    crop.save('crop.png')
+    pred.save('pred.png')
+    crop = crop.resize((224, 224))
+    clsf_impl(np.array(crop), 'drnetq', classifier_weights, 224, 2, 'cuda')
 if __name__ == '__main__':
     main()

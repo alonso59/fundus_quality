@@ -8,7 +8,7 @@ from PIL import ImageFilter
 from scipy.ndimage import label
 import torch.nn.functional as F
 from .models import SegmentationModels
-
+import matplotlib.pyplot as plt 
 def is_retina_mask_empty(retina_mask):
     for mask in retina_mask:
         if mask.size == 0:
@@ -79,23 +79,13 @@ def remove_remaining(prediction):
 def implement(source, model_name, weights, img_size, n_classes, device):
     dict_weights = torch.load(weights, map_location=device)
     """ Building model """
-    models_class = SegmentationModels(device, in_channels=3, img_size=img_size, n_classes=n_classes)
+    models_class = SegmentationModels(device, in_channels=1, img_size=img_size, n_classes=n_classes)
     model, preprocess_input, name_model = models_class.UNet(feature_start=32, layers=3, kernel_size=3, stride=1, padding=1)
-    print(dict_weights)
-    # original saved file with DataParallel
-    state_dict = torch.load(weights)
-    # create new OrderedDict that does not contain `module.`
-    from collections import OrderedDict
-    new_state_dict = OrderedDict()
-    for k, v in state_dict.items():
-        name = k[7:] # remove `module.`
-        new_state_dict[name] = v
-    # load params
-    model.load_state_dict(new_state_dict)
-    pred = predict(model, img_size, source, device)
+    model.load_state_dict(dict_weights, strict=True)
+    pred = predict(model, source, img_size)
     return pred
 
-def predict(model, img_size, source, device):
+def predict(model, source, img_size):
     """
     Perform the prediction of the retina's mask.
 
@@ -104,17 +94,15 @@ def predict(model, img_size, source, device):
     :param model_name: st, Name of the retina crop model.
     :return: Nothing.
     """
-    image = Image.open(source)
-    gray = image.convert('RGB')
-    h, w, _ = np.array(gray).shape
-    image = np.array(image)
-    print(image.shape)
-    gray = gray.resize((img_size, img_size))
-    print(np.array(gray).shape)
-    gray = np.array(gray).transpose((2,0,1))
-    gray = np.expand_dims(gray, axis=0)
-    gray = torch.tensor(gray, device=device, dtype=torch.float)
-    pred = model(gray)
+    img_orig = Image.open(source)
+    h, w = img_orig.size
+    img = img_orig.resize((img_size, img_size)).convert('L')
+    img = np.array(img)
+    img_orig = np.array(img_orig).astype('float')
+    image = np.expand_dims(img, axis=0)
+    image = np.expand_dims(image, axis=0)
+    image = torch.tensor(image, device='cuda', dtype=torch.float)
+    pred = model(image)
     pred = torch.sigmoid(pred)
     pred = pred.detach().cpu().squeeze(0).squeeze(0).numpy()
     pred = np.round(pred).astype('float')
@@ -123,18 +111,21 @@ def predict(model, img_size, source, device):
     pred = remove_remaining(pred)
     pred = pred.resize((h, w))
     pred = np.array(pred) / 255.
-    print(pred.max())
     pos = np.where(pred)
     if is_retina_mask_empty(pos):
-        raise RuntimeError('Error image empty!')
+        print('Invalid image!')
     xmin = np.min(pos[1])
     xmax = np.max(pos[1])
     ymin = np.min(pos[0])
     ymax = np.max(pos[0])
-    crop = image[ymin:ymax, xmin:xmax, :]
+    pred = np.expand_dims(pred, axis=-1)
+    pred = np.repeat(pred, 3, axis=-1)
+    img_mult = img_orig / 255
+    crop = img_mult[ymin:ymax, xmin:xmax]
     crop = add_zerosboxes(crop)
     crop = (crop * 255).astype(np.uint8)
-    return crop
+    pred = (pred * 255).astype(np.uint8)
+    return crop, pred
 
 def get_filenames(path, ext):
     X0 = []
