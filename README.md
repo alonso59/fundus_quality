@@ -3,6 +3,7 @@
 ```bash
 git clone https://github.com/alonso59/fundus_suitable.git  # clone
 cd fundus_suitable
+conda install pytorch torchvision cudatoolkit -c pytorch
 pip install -r requirements.txt  # install
 ```
 
@@ -23,10 +24,10 @@ model_name: 'unet' #unet, unet_imagenet, swin_unet, swin_unet_custom
 ## Operation modes
 
 ### Training, Evaluation & Predict
-(*) default
+
 ```bash
-python src/main.py --stage class* --mode train* --config configs/classifier.yaml*            
-                           pre           eval            configs/segmenter.yaml                           
+python src/main.py --stage class --mode train --config configs/classifier.yaml           
+                           pre           eval          configs/segmenter.yaml                           
                            det           predict  
 ```
 

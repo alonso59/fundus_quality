@@ -14,7 +14,7 @@ import os
 
 try:
     this_dir = os.path.dirname(os.path.realpath(__file__))
-    # print(this_dir)
+    # print(f'{this_dir}/src/nattenqkrpb_cuda.cpp')
     from torch.utils.cpp_extension import load
     nattenav_cuda = load(
         'nattenav_cuda', [f'{this_dir}/src/nattenav_cuda.cpp', f'{this_dir}/src/nattenav_cuda_kernel.cu'], verbose=False)
