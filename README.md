@@ -24,6 +24,7 @@ model_name: 'unet' #unet, unet_imagenet, swin_unet, swin_unet_custom
 
 ## Training, Evaluation & Predict
 
+(*) default
 ```bash
 python src/main.py --stage class* --mode train* --config configs/classifier.yaml*            
                            pre           eval            configs/segmenter.yaml                           
