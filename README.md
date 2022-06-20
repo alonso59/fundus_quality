@@ -59,7 +59,7 @@ python src/main.py --stage class --mode train --config configs/classifier.yaml
 #### Dataset detection
 
 ```bash
-    python src/common/prepare_files.py
+    python datasets/detection/perpare_files.py
 ```
 
     ├── dataset/
