@@ -8,7 +8,7 @@ train: train.txt  # train images (relative to 'path') 960 images
 val: val.txt  # val images (relative to 'path') 240 images
 test: #
 epochs: 50
-batch_size: 64
+batch_size: 32
 # Classes
 nc: 2  # number of classes
 names: ['macula', 'OD']  # class names

@@ -1,9 +1,9 @@
 model_name: 'inceptionv3' # inceptionv3, resnet18, vgg13, swin_custom, swin_tiny, nat_mini, nat_custom
 
 paths:
-  train_imgdir: 'dataset/D2/train'
-  val_imgdir: 'dataset/D2/val'
-  test_imgdir: 'dataset/D2/test'
+  train_imgdir: 'dataset/classification/D2/train'
+  val_imgdir: 'dataset/classification/D2/val'
+  test_imgdir: 'dataset/classification/D2/test'
 
 hyperparameters:
   loss_fn: 'cross_entropy'

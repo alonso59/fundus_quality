@@ -2,7 +2,7 @@ import os
 import yaml
 import argparse
 import numpy as np
-
+import cv2
 from PIL import Image
 from tqdm import tqdm
 
@@ -60,7 +60,7 @@ def main():
         if mode == 'train':
             with open(config, "r") as ymlfile:
                 cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-            det_train(batch_size=cfg['batch_size'], epochs=cfg['epochs'],weights=cfg['model_pretrain'], 
+            det_train(batch=cfg['batch_size'], epochs=cfg['epochs'],weights=cfg['model_pretrain'], 
                       data=opt.config, imgsz=224, save_dir='logs/detection/train/')
         # python path/to/train.py --data coco128.yaml --weights yolov5s.pt --img 640
         pass
@@ -76,9 +76,11 @@ def implement(source):
         cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
     crop, pred = pre_impl(source, cfg, 'unet', preprocessing_weights, 224, 1, 'cuda') # preprocessing
     crop, pred = Image.fromarray(crop), Image.fromarray(pred)
-    crop.save('crop.png')
-    pred.save('pred.png')
+    # print('outputs/' + os.path.split(source)[1])
+    crop.save('outputs/preprocessing/' + os.path.split(source)[1])
+    # pred.save('pred.png')
     crop = crop.resize((224, 224))
+
     clsf_impl(np.array(crop), 'drnetq', classifier_weights, 224, 2, 'cuda') # classification
     # else:
     #     X0 = get_filenames(source)
@@ -89,7 +91,7 @@ def implement(source):
     #         # pred.save('pred.png')
     #         crop = crop.resize((224, 224))
     #         clsf_impl(np.array(crop), 'drnetq', classifier_weights, 224, 2, 'cuda')
-    det_impl('outputs/', detector_wieghts, source) # detector
+    det_impl('outputs/detection/', detector_wieghts, 'outputs/preprocessing/'+os.path.split(source)[1], imgsz=(224,224)) # detector
 
 
 def get_filenames(path):

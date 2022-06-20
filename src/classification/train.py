@@ -8,6 +8,7 @@ from torch.optim.lr_scheduler import StepLR
 
 from .models import ClassificationModels
 from common.initialize import initialize as init
+
 def train(cfg):
     paths = cfg['paths']
     hyper = cfg['hyperparameters']
