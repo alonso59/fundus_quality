@@ -60,7 +60,7 @@ class SegmentationModels(nn.Module):
             stride=stride
         ).to(self.device)
 
-        return model, self.model.__name__
+        return model, model.__name__
 
     def Swin_Unet(self,
                 img_size = 224,

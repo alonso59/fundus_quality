@@ -16,7 +16,7 @@ from .training.trainer import trainer, eval
 from utils.initialize import initialize as init
 
 def train(cfg):
-    logger, checkpoint_path, version = init(cfg, 'preprocessing')
+    logger, checkpoint_path, version = init(cfg, '/preprocessing')
     paths = cfg['paths']
     hyper = cfg['hyperparameters']
     general = cfg['general']

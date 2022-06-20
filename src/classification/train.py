@@ -12,7 +12,7 @@ def train(cfg):
     paths = cfg['paths']
     hyper = cfg['hyperparameters']
     general = cfg['general']
-    logger, checkpoint_path, version = init(cfg, 'classification')
+    logger, checkpoint_path, version = init(cfg, '/classification')
     """ 
     Hyperparameters 
     """
