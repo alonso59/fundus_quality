@@ -33,26 +33,41 @@ python src/main.py --stage class --mode train --config configs/classifier.yaml
 
 #### Dataset classification
 
-    ├── dataset/               
-    |   ├── train/
-    |   |   ├── 0/
-    |   |   ├── 1/
-    |   ├── val/
-    |   |   ├── 0/
-    |   |   ├── 1/
-    |   ├── test/
-    |   |   ├── 0/
-    |   |   ├── 1/
+    ├── dataset/
+        classification/
+            ├── train/
+                ├── 0/
+                ├── 1/
+            ├── val/
+                ├── 0/  
+                ├── 1/
+            ├── test/
+                ├── 0/
+                ├── 1/
 
 #### Dataset segmentation
 
-    ├── dataset/               
-    |   ├── train/
-    |   |   ├── Images/
-    |   |   ├── Masks/
-    |   ├── val/
-    |   |   ├── Images/
-    |   |   ├── Masks/
+    ├── dataset/
+        segmentation/
+            ├── train/
+                ├── Images/
+                ├── Masks/
+            ├── val/
+                ├── Images/  
+                ├── Masks/
+
+#### Dataset detection
+
+```bash
+    python src/common/prepare_files.py
+```
+
+    ├── dataset/
+        detection/
+            ├── images/
+            ├── labels/
+            ├── train.txt
+            ├── val.txt
 
 ### Implementation
 
