@@ -2,7 +2,7 @@ import yaml
 import torch.nn as nn
 import segmentation_models_pytorch as smp
 
-from utils.summary import summary
+from common.summary import summary
 from .networks.unet import UNet
 from .networks.swin_unet import SwinUnet
 

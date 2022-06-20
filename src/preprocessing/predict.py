@@ -7,7 +7,7 @@ from scipy.ndimage import label
 from PIL import Image, ImageFilter
 
 from .models import SegmentationModels
-from utils.utils import get_filenames
+from common.utils import get_filenames
 
 def is_retina_mask_empty(retina_mask):
     for mask in retina_mask:

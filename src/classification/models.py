@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from utils.summary import summary
+from common.summary import summary
 from .networks import drnetq, swin_transformer, NAT
 
 class ClassificationModels(nn.Module):

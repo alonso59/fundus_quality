@@ -13,7 +13,7 @@ from .training.scheduler import *
 from .training.dataset import loaders
 from .training.trainer import trainer, eval
 
-from utils.initialize import initialize as init
+from common.initialize import initialize as init
 
 def train(cfg):
     logger, checkpoint_path, version = init(cfg, '/preprocessing')
