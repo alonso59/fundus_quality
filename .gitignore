@@ -15,3 +15,7 @@ pretrain/*
 .ipynb_checkpoints/*
 csv/*
 images1/*
+datasets/detection/retina/*
+datasets/PulbicDatasets/*
+datasets/segmentation/*
+datasets/classification*
