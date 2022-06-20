@@ -58,6 +58,8 @@ python src/main.py --stage  class*  --mode  train*   --config   configs/classifi
                                                     dataset/images/input.jpg
 ```
 
+# Citation
+
 ```bibtex
 @misc{pinedo,
       title={Fundus image quality assesment}, 
