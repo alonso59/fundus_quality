@@ -19,13 +19,15 @@ model_name: 'inceptionv3' # inceptionv3, resnet18, vgg13, swin_custom, swin_tiny
 ```yaml
 model_name: 'unet' #unet, unet_imagenet, swin_unet, swin_unet_custom
 ```
+
 # Operation modes
 
 ## Training, Evaluation & Predict
+
 ```bash
-python src/main.py --stage  class*  --mode  train*   --config   configs/classifier.yaml*            
-                            pre             eval                configs/segmenter.yaml                           
-                            det             predict  
+python src/main.py --stage class* --mode train* --config configs/classifier.yaml*            
+                           pre           eval            configs/segmenter.yaml                           
+                           det           predict  
 ```
 
 ### Dataset classification
@@ -54,8 +56,8 @@ python src/main.py --stage  class*  --mode  train*   --config   configs/classifi
 ## Implementation
 
 ```bash
-    python src/main.py --stage  impl    --source    dataset/images/
-                                                    dataset/images/input.jpg
+    python src/main.py --stage impl --source dataset/images/
+                                             dataset/images/input.jpg
 ```
 
 # Citation
