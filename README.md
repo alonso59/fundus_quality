@@ -6,23 +6,23 @@ cd fundus_suitable
 pip install -r requirements.txt  # install
 ```
 
-# Prepare config file YAML
+## Prepare config file YAML
 
-## Classification
+### Classification
 
 ```yaml
 model_name: 'inceptionv3' # inceptionv3, resnet18, vgg13, swin_custom, swin_tiny, nat_mini, nat_custom
 ```
 
-## Segmentation
+### Segmentation
 
 ```yaml
 model_name: 'unet' #unet, unet_imagenet, swin_unet, swin_unet_custom
 ```
 
-# Operation modes
+## Operation modes
 
-## Training, Evaluation & Predict
+### Training, Evaluation & Predict
 (*) default
 ```bash
 python src/main.py --stage class* --mode train* --config configs/classifier.yaml*            
@@ -30,7 +30,7 @@ python src/main.py --stage class* --mode train* --config configs/classifier.yaml
                            det           predict  
 ```
 
-### Dataset classification
+#### Dataset classification
 
     ├── dataset/               
     |   ├── train/
@@ -43,7 +43,7 @@ python src/main.py --stage class* --mode train* --config configs/classifier.yaml
     |   |   ├── 0/
     |   |   ├── 1/
 
-### Dataset segmentation
+#### Dataset segmentation
 
     ├── dataset/               
     |   ├── train/
@@ -53,14 +53,14 @@ python src/main.py --stage class* --mode train* --config configs/classifier.yaml
     |   |   ├── Images/
     |   |   ├── Masks/
 
-## Implementation
+### Implementation
 
 ```bash
     python src/main.py --stage impl --source dataset/images/
                                              dataset/images/input.jpg
 ```
 
-# Citation
+## Citation
 
 ```bibtex
 @misc{pinedo,
