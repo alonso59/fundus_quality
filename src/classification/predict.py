@@ -26,14 +26,14 @@ def save_csv(csvfile, labels):
     df.to_csv('test.csv', index=False)
     pass
 
-def implement(image, model_name, weights, img_size, n_classes, device):
+def implement(source, model_name, weights, img_size, n_classes, device):
     dict_weights = torch.load(weights, map_location=device)
     """ Building model """
     model_classifier = ClassificationModels(device, 3, img_size, n_classes, False)
     model, layer, is_inception = model_classifier.model_builder(model_name=model_name) 
     model.load_state_dict(dict_weights, strict=False)
-    pred = predict(model, image, device)
-    print(pred)
+    pred = predict(model, source, device)
+    return pred
 
 def predict(model, image, device):
     image = np.array(image) / 255.
@@ -43,7 +43,7 @@ def predict(model, image, device):
     pred = model(image)
     pred = torch.softmax(pred, dim=1)
     pred = torch.argmax(pred).detach().cpu().numpy()
-    return pred
+    return pred.item()
 
 def main():
     parser = argparse.ArgumentParser()
