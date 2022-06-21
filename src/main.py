@@ -13,7 +13,8 @@ from classification.predict import implement as clsf_impl
 from preprocessing.predict import implement as pre_impl
 from retina_det.implement import impl as det_impl
 from retina_det.train import run as det_train
-
+import pandas as pd
+import datetime
 
 def main():
     """
@@ -37,7 +38,7 @@ def main():
     parser.add_argument('--source', type=str, default='dataset/images', help='file or dir/, jpg, png, bmp, tiff')
     parser.add_argument('--save_results', type=bool, default=True, help='Save results in output/', required=False)
     opt = parser.parse_args()
-    
+
     config = opt.config
     stage = opt.stage
     mode = opt.mode
@@ -46,7 +47,6 @@ def main():
     if stage == 'impl':
         create_dir('outputs/detection')
         create_dir('outputs/preprocessing')
-        create_dir('outputs/suitability')
         implement(source, opt.save_results)
     elif stage == 'class':
         assert config == 'configs/classifier.yaml'
@@ -130,10 +130,14 @@ def implement(source, save_results=True):
         else:
             suitability.append(0)
         filename.append(os.path.split(i)[1])
-    print(macula)
-    print(od)
-    print(classification)
-    print(suitability)
-    print(filename)
+    
+    df = pd.DataFrame({'Filename': filename,
+                        'Classification': classification,
+                        'Macula conf': macula,
+                        'OD conf': od,
+                        'Suitability': suitability}
+                        )
+    now = datetime.datetime.now()
+    df.to_csv('outputs/' + str(now.strftime("%Y-%m-%d_%H_%M_%S")) + '.csv',index=False)
 if __name__ == '__main__':
     main()

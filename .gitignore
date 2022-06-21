@@ -18,4 +18,5 @@ images1/*
 datasets/detection/retina/*
 datasets/PulbicDatasets/*
 datasets/segmentation/*
-datasets/classification*
+datasets/classification/*
+outputs/*
