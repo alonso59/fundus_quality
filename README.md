@@ -40,7 +40,7 @@ python src/main.py --stage class --mode train --config configs/classifier.yaml
 
 #### Dataset classification
 
-    ├── dataset/
+    ├── datasets/
         classification/
             ├── train/
                 ├── 0/
@@ -54,7 +54,7 @@ python src/main.py --stage class --mode train --config configs/classifier.yaml
 
 #### Dataset segmentation
 
-    ├── dataset/
+    ├── datasets/
         segmentation/
             ├── train/
                 ├── Images/
@@ -69,7 +69,7 @@ python src/main.py --stage class --mode train --config configs/classifier.yaml
     python datasets/detection/perpare_files.py
 ```
 
-    ├── dataset/
+    ├── datasets/
         detection/
             ├── images/
             ├── labels/
