@@ -17,7 +17,7 @@ hyperparameters:
   scheduler: 
     type: 'step' # cosine, exponential
     gamma: 0.8
-    step: 50
+    step: 60
   n_gpus: 2
 
 general:
