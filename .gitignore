@@ -10,7 +10,6 @@ qualiti-retina-dataset/*
 train/*
 riqa/*
 image-quality/*
-images/*
 pretrain/*
 .ipynb_checkpoints/*
 csv/*
