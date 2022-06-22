@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from common.summary import summary
-from .networks import drnetq, swin_transformer, NAT
+from .networks import drnetq, swin_transformer, NAT, inceptionv4
 
 class ClassificationModels(nn.Module):
     def __init__(self, device, in_channels, img_size, n_classes=2, pretrain=True) -> None:
@@ -23,8 +23,12 @@ class ClassificationModels(nn.Module):
             self.is_inception = True
         if model_name == 'resnet18':
             self.model, self.layer_target = self.resnet18()
+        if model_name == 'resnet152':
+            self.model, self.layer_target = self.resnet152()
         if model_name == 'vgg13':
             self.model, self.layer_target = self.vgg13()
+        if model_name == 'vgg19':
+            self.model, self.layer_target = self.vgg19()
         if model_name == 'drnetq':
             self.model, self.layer_target = self.DRNetq()
         if model_name == 'swin_custom':
@@ -50,8 +54,20 @@ class ClassificationModels(nn.Module):
         self.model.fc = nn.Linear(512, self.n_classes)
         return self.model.to(self.device), self.layer_target
 
+    def resnet152(self):      
+        self.model = models.resnet152(pretrained=self.pretrain)
+        self.layer_target = [self.model.layer4[-1]]
+        self.model.fc = nn.Linear(2048, self.n_classes)
+        return self.model.to(self.device), self.layer_target
+
     def vgg13(self):
         self.model = models.vgg13(pretrained=self.pretrain)
+        self.layer_target = [self.model.features]
+        self.model.classifier[6] = nn.Linear(4096, self.n_classes)
+        return self.model.to(self.device), self.layer_target
+
+    def vgg19(self):
+        self.model = models.vgg19(pretrained=self.pretrain)
         self.layer_target = [self.model.features]
         self.model.classifier[6] = nn.Linear(4096, self.n_classes)
         return self.model.to(self.device), self.layer_target

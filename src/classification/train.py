@@ -23,7 +23,7 @@ def train(cfg):
     B1 = hyper['b1']
     B2 = hyper['b2']
     weight_decay = hyper['weight_decay']
-    gpus_ids = [0]
+    gpus_ids = [0, 1]
     """
     Paths
     """
@@ -82,7 +82,7 @@ def train(cfg):
             scheduler=scheduler,
             iter_plot_img=int(num_epochs * 0.1),
             name_model=name_model,
-            callback_stop_value=int(num_epochs * 0.15),
+            callback_stop_value=int(num_epochs * 1),
             tb_dir=version,
             logger=logger,
             layer=layer,

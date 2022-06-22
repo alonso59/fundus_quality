@@ -9,7 +9,7 @@ def loaders(traindir, valdir, image_size, batch_size):
         transforms.Resize((image_size, image_size)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
-        transforms.RandomRotation(degrees=(-20, 20)),
+        transforms.RandomRotation(degrees=(-45, 45)),
         transforms.RandomAutocontrast(),
         transforms.ToTensor(),
     ])
