@@ -3,7 +3,7 @@ import torch.nn as nn
 import torchvision.models as models
 from common.summary import summary
 from .networks import drnetq, swin_transformer, NAT, inceptionv4
-
+import sys
 class ClassificationModels(nn.Module):
     def __init__(self, device, in_channels, img_size, n_classes=2, pretrain=True) -> None:
         super().__init__()
@@ -21,6 +21,8 @@ class ClassificationModels(nn.Module):
         if model_name == 'inceptionv3':
             self.model, self.layer_target = self.inceptionv3()
             self.is_inception = True
+        if model_name == 'inceptionv4':
+            self.model, self.layer_target = self.inception_v4()
         if model_name == 'resnet18':
             self.model, self.layer_target = self.resnet18()
         if model_name == 'resnet152':
@@ -49,9 +51,8 @@ class ClassificationModels(nn.Module):
         return model.to(self.device), layer_target
 
     def inception_v4(self):
-        model = inceptionv4.inceptionv4(n_class=self.n_classes)
-        layer_target = [model.features]
-        model.classifier[6] = nn.Linear(4096, self.n_classes)
+        model = inceptionv4.inception_resnet_v2(n_class=self.n_classes)
+        layer_target = model.inception_resnet_c[-1]
         return model.to(self.device), layer_target
 
     def resnet18(self):      
