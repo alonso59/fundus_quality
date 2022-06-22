@@ -10,7 +10,7 @@ pip install -r requirements.txt  # install
 ## Embedded repository YOLO V5 for retina detection FORK
 
 ```bash
-cd fundus_suitable
+cd fundus_suitable/src/
 git clone https://github.com/alonso59/retina_detection.git
 ```
 
