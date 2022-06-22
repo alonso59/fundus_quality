@@ -1,9 +1,9 @@
-model_name: 'inceptionv4' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
+model_name: 'drnetq' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
 
 paths:
-  train_imgdir: 'datasets/classification/d1/train'
-  val_imgdir: 'datasets/classification/d1/val'
-  test_imgdir: 'datasets/classification/d1/test'
+  train_imgdir: 'datasets/classification/D2/train'
+  val_imgdir: 'datasets/classification/D2/val'
+  test_imgdir: 'datasets/classification/D2/test'
 
 hyperparameters:
   loss_fn: 'cross_entropy'
@@ -18,7 +18,7 @@ hyperparameters:
     type: 'step' # cosine, exponential
     gamma: 0.8
     step: 60
-  n_gpus: 2
+  n_gpus: 3
 
 general:
   pretrain: True

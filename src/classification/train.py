@@ -23,7 +23,7 @@ def train(cfg):
     B1 = hyper['b1']
     B2 = hyper['b2']
     weight_decay = hyper['weight_decay']
-    gpus_ids = [0, 1]
+    gpus_ids = [0, 1, 2, 3]
     """
     Paths
     """

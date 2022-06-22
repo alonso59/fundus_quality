@@ -41,8 +41,8 @@ def initialize(cfg, stage_name):
                         datefmt='%H:%M:%S',
                         level=logging.INFO)
     logger = logging.getLogger()
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    logger.addHandler(stdout_handler)
+    # stdout_handler = logging.StreamHandler(sys.stdout)
+    # logger.addHandler(stdout_handler)
 
     """ Seeding """
     seeding(42)  # 42

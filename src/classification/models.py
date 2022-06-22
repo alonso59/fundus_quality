@@ -51,8 +51,8 @@ class ClassificationModels(nn.Module):
         return model.to(self.device), layer_target
 
     def inception_v4(self):
-        model = inceptionv4.inception_resnet_v2(n_class=self.n_classes)
-        layer_target = model.inception_resnet_c[-1]
+        model = inceptionv4.inceptionv4(n_class=self.n_classes)
+        layer_target = model.inception_c[-1]
         return model.to(self.device), layer_target
 
     def resnet18(self):      
