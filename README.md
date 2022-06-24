@@ -1,3 +1,11 @@
+<p align="center">
+    <img src="images/input.jpeg" alt="crop" width="250"/>
+</p>
+<p align="center">
+    <img src="images/output.jpeg" alt="crop" width="250"/>
+</p>
+
+
 # Getting started
 
 ```bash
@@ -10,8 +18,8 @@ pip install -r requirements.txt  # install
 ## Embedded repository YOLO V5 for retina detection FORK
 
 ```bash
-cd fundus_suitable/src/
-git clone https://github.com/alonso59/retina_detection.git
+cd src/
+git clone https://github.com/alonso59/retina_det.git
 ```
 
 ## Prepare config file YAML
@@ -33,6 +41,7 @@ model_name: 'unet' #unet, unet_imagenet, swin_unet, swin_unet_custom
 ### Training, Evaluation & Predict
 
 ```bash
+cd ..
 python src/main.py --stage class --mode train --config configs/classifier.yaml           
                            pre           eval          configs/segmenter.yaml                           
                            det           predict  
