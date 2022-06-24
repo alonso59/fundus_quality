@@ -32,8 +32,8 @@ def implement(source, model_name, weights, img_size, n_classes, device):
     model_classifier = ClassificationModels(device, 3, img_size, n_classes, False)
     model, layer, is_inception = model_classifier.model_builder(model_name=model_name) 
     model.load_state_dict(dict_weights, strict=False)
-    pred = predict(model, source, device)
-    return pred
+    pred, y_pr = predict(model, source, device)
+    return pred, y_pr
 
 def predict(model, image, device):
     image = np.array(image) / 255.
@@ -42,8 +42,10 @@ def predict(model, image, device):
     image = torch.tensor(image, device=device, dtype=torch.float)
     pred = model(image)
     pred = torch.softmax(pred, dim=1)
+    y_pr = torch.max(pred).detach().cpu().numpy()
     pred = torch.argmax(pred).detach().cpu().numpy()
-    return pred.item()
+    
+    return pred, y_pr
 
 def main():
     parser = argparse.ArgumentParser()

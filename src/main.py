@@ -110,7 +110,7 @@ def implement(source, save_results=True):
         crop1 = crop1.resize((224, 224))
         
         # classification
-        pred_class = clsf_impl(source=np.array(crop1),
+        pred_class, y_pr = clsf_impl(source=np.array(crop1),
                          model_name=cfg_clas['model_name'],
                          weights=classifier_weights, img_size=cfg_clas['general']['img_size'],
                          n_classes=cfg_clas['general']['n_classes'],
@@ -122,14 +122,42 @@ def implement(source, save_results=True):
         pred_det, mac, disk = det_impl(weights=detector_wieghts, source=crop, imgsz=(224, 224))  # detector
         macula.append(mac)
         od.append(disk)
-        
-        if save_results:
-            pred_det = Image.fromarray(pred_det)
-            pred_det.save('outputs/detection/' + os.path.split(i)[1])
+        suit = 0
         if pred_class == 1 and mac > 0 and disk > 0:
-            suitability.append(1)
+            suit = 1
+            suitability.append(suit)
+            text_suitable = 'High suitability confidence'
+            fontColor = (100,255,100)
         else:
-            suitability.append(0)
+            suitability.append(suit)
+            text_suitable = 'Low suitability confidence'
+            fontColor = (255,100,100)
+        if save_results:
+            pred_copy = pred_det
+            # Write some Text
+            font                   = cv2.FONT_HERSHEY_SIMPLEX
+            bottomLeftCornerOfText = (10, 100)
+            thickness              = 6
+            lineType               = 3
+            
+            cv2.putText(pred_copy, text_suitable, 
+                bottomLeftCornerOfText, 
+                font, 
+                (pred_copy.shape[0] / pred_copy.shape[1]) * 5,
+                fontColor,
+                thickness,
+                lineType)
+            cv2.putText(pred_copy, f'Quality Class:{pred_class} Conf:{y_pr:0.4f}', 
+                (10, 400), 
+                font, 
+                (pred_copy.shape[0] / pred_copy.shape[1]) * 5,
+                (100,100,255),
+                thickness,
+                lineType)
+            pred_copy = Image.fromarray(pred_copy)
+            pred_copy.save('outputs/detection/' + os.path.split(i)[1])
+        
+        
         filename.append(os.path.split(i)[1])
     
     df = pd.DataFrame({'Filename': filename,
@@ -140,5 +168,7 @@ def implement(source, save_results=True):
                         )
     now = datetime.datetime.now()
     df.to_csv('outputs/' + str(now.strftime("%Y-%m-%d_%H_%M_%S")) + '.csv',index=False)
+    return pred_det, crop
+
 if __name__ == '__main__':
     main()
