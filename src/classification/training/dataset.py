@@ -17,7 +17,7 @@ class Transforms:
 def loaders(traindir, valdir, image_size, batch_size):
     train_transforms = T.Compose([
         T.Resize(image_size, image_size),
-        T.GaussianBlur(blur_limit=(2, 4), p=0.5),
+        T.GaussianBlur(blur_limit=(3, 7), p=0.5),
         T.Affine(scale=(0.8, 1.2), p=0.5),
         T.RandomBrightnessContrast(p=0.5),
         T.HorizontalFlip(p=0.5),
