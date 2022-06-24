@@ -1,4 +1,4 @@
-model_name: 'drnetq' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
+model_name: 'vgg19' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
 
 paths:
   train_imgdir: 'datasets/classification/d1/train'
@@ -8,16 +8,16 @@ paths:
 hyperparameters:
   loss_fn: 'cross_entropy'
   optimizer: 'adam' # sgd
-  batch_size: 40
-  num_epochs: 500
-  lr: 0.005
-  b1: 0.9
+  batch_size: 32
+  num_epochs: 300
+  lr: 0.001
+  b1: 0.8
   b2: 0.999
-  weight_decay: 0.001
+  weight_decay: 0.00001
   scheduler: 
     type: 'step' # cosine, exponential
-    gamma: 0.6
-    step: 10
+    gamma: 0.8
+    step: 30
   n_gpus: 2
 
 general:
