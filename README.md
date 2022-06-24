@@ -1,5 +1,5 @@
-<img src="images/input.jpeg" alt="accuracy" height="400"/>
-<img src="images/output.jpeg" alt="loss" height="400"/>
+<img src="images/input.jpeg" alt="accuracy" height="250"/>
+<img src="images/output.jpeg" alt="loss" height="250"/>
 
 
 
