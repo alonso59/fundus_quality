@@ -1,9 +1,11 @@
 
 
 # Getting started
-![alttext](images/input.jpg "Input")
-VS
-![alttext](images/output.jpg "Output")
+<p align="center">
+    <img src="images/input.jpeg" alt="Input" height="250"/>
+    <img src="images/output.jpeg" alt="Output" height="250"/>
+</p>
+
 
 ```bash
 git clone https://github.com/alonso59/fundus_suitable.git  # clone
