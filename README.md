@@ -1,5 +1,7 @@
-<img src="images/input.jpeg" alt="accuracy" height="250"/>
-<img src="images/output.jpeg" alt="loss" height="250"/>
+
+![alttext](images/input.jpg "Input")
+VS
+![alttext](images/output.jpg "Output")
 
 
 
