@@ -1,4 +1,4 @@
-model_name: 'inceptionv4' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
+model_name: 'drnetq' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
 
 paths:
   train_imgdir: 'datasets/classification/d1/train'
@@ -23,4 +23,4 @@ hyperparameters:
 general:
   pretrain: True
   n_classes: 2
-  img_size: 299
+  img_size: 224
