@@ -23,4 +23,4 @@ hyperparameters:
 general:
   pretrain: True
   n_classes: 2
-  img_size: 299
+  img_size: 224
