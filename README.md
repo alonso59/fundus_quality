@@ -1,9 +1,6 @@
-<p align="center">
-    <img src="images/input.jpeg" alt="crop" width="250"/>
-</p>
-<p align="center">
-    <img src="images/output.jpeg" alt="crop" width="250"/>
-</p>
+<img src="images/input.jpeg" alt="accuracy" height="400"/>
+<img src="images/output.jpeg" alt="loss" height="400"/>
+
 
 
 # Getting started
