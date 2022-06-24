@@ -40,7 +40,7 @@ def trainer(num_epochs,
     stop_early = 0
     best_valid_loss = float("inf")
 
-    img_sample, labels = next(iter(val_loader))
+    # img_sample, labels = next(iter(val_loader))
 
     for epoch in range(num_epochs):
         lr_ = optimizer.param_groups[0]["lr"]
@@ -53,14 +53,15 @@ def trainer(num_epochs,
                                                         loss_fn,
                                                         iter_num,
                                                         device,
-                                                        is_inception
+                                                        is_inception,
+                                                        layer,
                                                         )
 
         scheduler.step()
-        pick0 = np.random.randint(0, len(img_sample))
-        if epoch % 5 == 0:
-            print('Saving examples in TensorBoard....')
-            tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, epoch, device, layer)
+        # pick0 = np.random.randint(0, len(img_sample))
+        # if epoch % 5 == 0:
+        #     print('Saving examples in TensorBoard....')
+        #     tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, epoch, device, layer)
 
         val_loss, val_metric, iter_val = validation(model, val_loader, loss_fn, writer, iter_val, device)
 
@@ -85,28 +86,28 @@ def trainer(num_epochs,
         logger.info(str_print)
     print('Finishing train....')
     load_best_model = torch.load(checkpoint_path + 'model.pth')
-    tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, 0, device, layer)
+    # tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, 0, device, layer)
     tb_save_CM_roc_auc(model, val_loader, writer, device)
     
 
 
-def train(loader, model, writer, optimizer, loss_fn, iter_num, device, is_inception):
+def train(loader, model, writer, optimizer, loss_fn, iter_num, device, is_inception, layer):
     train_loss = 0.0
     train_iou = 0.0
     loop = tqdm(loader, ncols=120)
     acc = Accuracy()
     model.train()
-    for batch_idx, (x, y) in enumerate(loop):
-        x = x.type(torch.float).to(device)
-        y = y.type(torch.long).to(device)
+    for batch_idx, data  in enumerate(loop):
+        x = data[0]['image'].type(torch.float).to(device)
+        y = data[1].type(torch.long).to(device)
         # forward
-        # ------------ inception ------------
+        # ------------ is inception ------------
         if is_inception :
             y_pred, aux_outputs = model(x)
             loss1 = loss_fn(y_pred, y)
             loss2 = loss_fn(aux_outputs, y)
             loss = loss1 + 0.4*loss2
-        # ------------ inception ------------
+        # ------------ is inception ------------
         else:
             y_pred = model(x)
             loss = loss_fn(y_pred, y)
@@ -123,6 +124,12 @@ def train(loader, model, writer, optimizer, loss_fn, iter_num, device, is_incept
         # tensorboard callbacks
         writer.per_iter(loss.item(), m0.item(), iter_num, name='Train')
         writer.learning_rate(optimizer.param_groups[0]["lr"], iter_num)
+        # print(iter_num)
+        if iter_num % len(loader)*20 == 0.0:
+            print('Save image tensorboard...')
+            preds = torch.softmax(y_pred[0, :], dim=0)
+            preds = torch.argmax(preds).item()
+            writer.save_img_preds(model, layer, x[0, :, :, :], preds, iter_num, device)
         iter_num = iter_num + 1
     return train_loss / len(loader), train_iou / len(loader), iter_num, optimizer.param_groups[0]["lr"]
 
@@ -134,9 +141,9 @@ def validation(model, loader, loss_fn, writer, iter_val, device):
     model.eval()
     acc = Accuracy()
     with torch.no_grad():
-        for batch_idx, (x, y) in enumerate(loop):
-            x = x.type(torch.float).to(device)
-            y = y.type(torch.long).to(device)
+        for batch_idx, data in enumerate(loop):
+            x = data[0]['image'].type(torch.float).to(device)
+            y = data[1].type(torch.long).to(device)
             y_pred= model(x)
             m0 = acc(y_pred.detach().cpu(), y.detach().cpu())
             loss = loss_fn(y_pred, y)

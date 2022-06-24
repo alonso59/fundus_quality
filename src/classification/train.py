@@ -1,7 +1,7 @@
 import yaml
 import torch
 import torch.nn as nn
-
+import logging
 from .training.trainer import *
 from .training.dataset import loaders
 from torch.optim.lr_scheduler import StepLR
@@ -13,7 +13,7 @@ def train(cfg):
     paths = cfg['paths']
     hyper = cfg['hyperparameters']
     general = cfg['general']
-    logger, checkpoint_path, version = init(cfg, '/classification')
+    logger, checkpoint_path, version = init(cfg, 'classification')
     """ 
     Hyperparameters 
     """
