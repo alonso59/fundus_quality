@@ -8,8 +8,8 @@ import torch
 
 def initialize(cfg, stage_name):
     """Directories"""
-    version = datetime.datetime.now()
-    version = 'logs/' + stage_name + '_' + str(version.strftime("%Y-%m-%d_%H_%M_%S")) + '/'
+    now = datetime.datetime.now()
+    version = 'logs/' + stage_name + '_' + str(now.strftime("%Y-%m-%d_%H_%M_%S")) + '/'
     checkpoint_path = version + "checkpoints/"
     create_dir(checkpoint_path)
     with open(version + 'config.txt', 'w') as text_file:
@@ -35,14 +35,17 @@ def initialize(cfg, stage_name):
         text_file.close()
 
     """logging"""
+
     logging.basicConfig(filename=version + "info.log",
-                        filemode='a',
+                        mode='a',
                         format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%H:%M:%S',
                         level=logging.INFO)
     logger = logging.getLogger()
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    logger.addHandler(stdout_handler)
+    logger.addHandler(logging.FileHandler(version + "info.log"))
+    logger.info('initialize')
+    # stdout_handler = logging.StreamHandler(sys.stdout)
+    # logger.addHandler(stdout_handler)
 
     """ Seeding """
     seeding(42)  # 42

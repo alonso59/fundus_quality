@@ -1,11 +1,12 @@
 from torch.utils.tensorboard import SummaryWriter
 import torch
 from torchvision.utils import draw_segmentation_masks as drawer 
-from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam import GradCAMPlusPlus
 from pytorch_grad_cam.utils.image import show_cam_on_image
 import sys
 from PIL import Image
 import numpy as np
+from torchvision import transforms
 
 class TensorboardWriter():
 
@@ -35,9 +36,10 @@ class TensorboardWriter():
         self.writer.add_text(tag=tag, text_string=text_string)
 
     def save_img_preds(self, model, layer_target, input_tensor, label, step, device):
+        self.writer.add_images(f'Data', denormalize(input_tensor), step, dataformats='CHW')
         if label == 0:
             pred = grad_cam(model, layer_target, input_tensor, device)
-            self.writer.add_images(f'Class0', pred, step, dataformats='HWC')
+            self.writer.add_images(f'Class0', pred, step, dataformats='HWC')           
         if label == 1:
             pred = grad_cam(model, layer_target, input_tensor, device)
             self.writer.add_images(f'Class1', pred, step, dataformats='HWC')
@@ -50,13 +52,15 @@ class TensorboardWriter():
 
 
 def grad_cam(model, layer_target, input_tensor, device):
+    model.eval()
     # cam = GradCAM(model, layer_target, use_cuda=True, reshape_transform=reshape_transform)
-    cam = GradCAM(model, layer_target, use_cuda=True)
-    grayscale_cam = cam(input_tensor=input_tensor, targets=None)
+    cam = GradCAMPlusPlus(model, layer_target, use_cuda=True)
+    grayscale_cam = cam(input_tensor=input_tensor.unsqueeze(0), targets=None)
     grayscale_cam = grayscale_cam[0, :]
-    visualization = show_cam_on_image(input_tensor.squeeze(0).detach().cpu().numpy().transpose(1, 2, 0), grayscale_cam, use_rgb=True)
+    visualization = show_cam_on_image(denormalize(input_tensor).detach().cpu().numpy().transpose(1, 2, 0), grayscale_cam, use_rgb=True)
     vis_img = np.array(Image.fromarray(visualization).convert('RGB')) / 255.
     vis_tensor = torch.tensor(vis_img, dtype=torch.float, device=device)
+    model.train()
     return vis_tensor
 
 def reshape_transform(tensor, height=7, width=7):
@@ -67,3 +71,7 @@ def reshape_transform(tensor, height=7, width=7):
     # like in CNNs.
     result = tensor.transpose(2, 3).transpose(1, 2)
     return result
+
+def denormalize(tensor):
+    invTrans = transforms.Normalize(mean=[-0.485, -0.456, -0.406], std=[1/0.229, 1/0.224, 1/0.225])
+    return torch.clamp(invTrans(tensor), 0, 1)

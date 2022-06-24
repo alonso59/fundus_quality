@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from common.summary import summary
-from .networks import drnetq, swin_transformer, NAT, inceptionv4
+from .networks import drnetq, swin_transformer, NAT 
+from timm.models.inception_v4 import inception_v4
+import timm
 import sys
 class ClassificationModels(nn.Module):
     def __init__(self, device, in_channels, img_size, n_classes=2, pretrain=True) -> None:
@@ -22,7 +24,7 @@ class ClassificationModels(nn.Module):
             self.model, self.layer_target = self.inceptionv3()
             self.is_inception = True
         if model_name == 'inceptionv4':
-            self.model, self.layer_target = self.inception_v4()
+            self.model, self.layer_target = self.incepv4()
         if model_name == 'resnet18':
             self.model, self.layer_target = self.resnet18()
         if model_name == 'resnet152':
@@ -45,14 +47,19 @@ class ClassificationModels(nn.Module):
 
     def inceptionv3(self):
         model = models.inception_v3(pretrained=self.pretrain)
-        layer_target = [model.Mixed_7c]  
-        model.AuxLogits.fc = nn.Linear(768, self.n_classes)
-        model.fc = nn.Linear(2048, self.n_classes)
+        layer_target = [model.Mixed_7c]
+        num_ftrs = model.AuxLogits.fc.in_features
+        model.AuxLogits.fc = nn.Linear(num_ftrs, self.n_classes)
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, self.n_classes)
         return model.to(self.device), layer_target
 
-    def inception_v4(self):
-        model = inceptionv4.inception_resnet_v2(n_class=self.n_classes)
-        layer_target = model.inception_resnet_c[-1]
+    def incepv4(self):
+        model = timm.models.create_model('inception_resnet_v2', pretrained=True, num_classes=self.n_classes)
+        # print(model)
+        # layer_target = [model.features]
+        # print(model)
+        layer_target = [model.conv2d_7b]
         return model.to(self.device), layer_target
 
     def resnet18(self):      
