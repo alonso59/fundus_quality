@@ -2,8 +2,8 @@
 
 # Getting started
 <p align="center">
-    <img src="images/input.jpeg" alt="Input" height="250"/>
-    <img src="images/output.jpeg" alt="Output" height="250"/>
+    <img src="images/input.jpeg" alt="Input" height="350"/>
+    <img src="images/output.jpeg" alt="Output" height="350"/>
 </p>
 
 
