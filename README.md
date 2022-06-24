@@ -1,11 +1,9 @@
 
+
+# Getting started
 ![alttext](images/input.jpg "Input")
 VS
 ![alttext](images/output.jpg "Output")
-
-
-
-# Getting started
 
 ```bash
 git clone https://github.com/alonso59/fundus_suitable.git  # clone
