@@ -105,7 +105,7 @@ def implement(source, save_results=True):
         crop1, pred_crop = Image.fromarray(crop), Image.fromarray(pred_crop)
 
         if save_results:
-            crop1.save('outputs/preprocessing/' + os.path.split(i)[1])
+            crop1.save('outputs/preprocessing1/' + os.path.split(i)[1])
         
         crop1 = crop1.resize((224, 224))
         
@@ -155,7 +155,7 @@ def implement(source, save_results=True):
                 thickness,
                 lineType)
             pred_copy = Image.fromarray(pred_copy)
-            pred_copy.save('outputs/detection/' + os.path.split(i)[1])
+            pred_copy.save('outputs/detection1/' + os.path.split(i)[1])
         
         
         filename.append(os.path.split(i)[1])
@@ -171,4 +171,7 @@ def implement(source, save_results=True):
     return pred_det, crop
 
 if __name__ == '__main__':
+    # try:
     main()
+    # except Exception as ex:
+    #     print(ex)

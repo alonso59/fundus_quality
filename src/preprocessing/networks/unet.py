@@ -1,8 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from torchsummary import summary
-
+import torch.nn.utils.parametrize as p
 
 class UNet(nn.Module):
     """
@@ -56,7 +55,7 @@ class UNet(nn.Module):
         layers.append(nn.Conv2d(feats, num_classes, kernel_size=(1, 1)))
 
         self.layers = nn.ModuleList(layers)
-
+    
     def forward(self, x):
         xi = [self.layers[0](x)]
         # Down path
@@ -68,17 +67,17 @@ class UNet(nn.Module):
         return self.layers[-1](xi[-1])
 
 class DoubleConv(nn.Module):
-    """[ Conv2d => BatchNorm (optional) => ReLU ] x 2."""
+    """[ Conv2d => LeakyReLU => BatchNorm (optional) ] x 2."""
 
     def __init__(self, in_ch: int, out_ch: int, dp: float, kernel_size: tuple,  padding: int, stride: int):
         super().__init__()
         layers = [
             nn.Conv2d(in_ch, out_ch, kernel_size=kernel_size, padding=padding, stride=stride),
-            nn.BatchNorm2d(out_ch),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(out_ch), 
+            nn.LeakyReLU(inplace=True),
             nn.Conv2d(out_ch, out_ch, kernel_size=kernel_size, padding=padding, stride=stride),
             nn.BatchNorm2d(out_ch),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(inplace=True),
         ]
         if dp != 0.0:
             layers.append(nn.Dropout(dp))
@@ -129,24 +128,3 @@ class Up(nn.Module):
         # Concatenate along the channels axis
         x = torch.cat([x2, x1], dim=1)
         return self.conv(x)
-
-
-
-def test():
-    model = Unet(
-                num_classes=3,
-                input_channels= 1,
-                num_layers=4,
-                features_start=16,
-                bilinear=False,
-                dp=0.5,
-                kernel_size=(5, 5),
-                padding=2,
-                stride=1
-                )
-    model = model.to(torch.device('cuda'))
-    summary(model, input_size=(1, 224, 224), batch_size=-1)
-
-
-if __name__ == "__main__":
-    test()

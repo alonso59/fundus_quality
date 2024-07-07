@@ -785,6 +785,7 @@ class SwinUnet(nn.Module):
     num_heads=[3, 6, 12, 24],
     window_size=7,
     drop_path_rate=0.1,
+    mlp_ratio=4.,
     ):
         super(SwinUnet, self).__init__()
         self.num_classes = num_classes
@@ -799,7 +800,7 @@ class SwinUnet(nn.Module):
                                 depths=depths,
                                 num_heads=num_heads,
                                 window_size=window_size,
-                                mlp_ratio=4.,
+                                mlp_ratio=mlp_ratio,
                                 qkv_bias=True,
                                 qk_scale=None,
                                 drop_rate=0.0,
@@ -832,7 +833,7 @@ class SwinUnet(nn.Module):
                         print("delete key:{}".format(k))
                         del pretrained_dict[k]
                 msg = self.swin_unet.load_state_dict(pretrained_dict,strict=False)
-                # print(msg)
+                print(msg)
                 return
             pretrained_dict = pretrained_dict['model']
             print("---start load pretrained modle of swin encoder---")
@@ -851,7 +852,7 @@ class SwinUnet(nn.Module):
                         del full_dict[k]
 
             msg = self.swin_unet.load_state_dict(full_dict, strict=False)
-            # print(msg)
+            print(msg)
         else:
             print("none pretrain")
 

@@ -28,7 +28,8 @@ def initialize(cfg, stage_name):
         text_file.write(f"Step size: {sch['step']}\n")
         gen = cfg['general']
         text_file.write(f"*** Gerneral settings ***\n")
-        text_file.write(f"Image Size: {gen['img_size']}\n")
+        text_file.write(f"Image Size Height: {gen['img_sizeh']}\n")
+        text_file.write(f"Image Size Width: {gen['img_sizew']}\n")
         text_file.write(f"Pretrain: {gen['pretrain']}\n")
         text_file.write(f"Num classes: {gen['n_classes']}\n")
         text_file.write(f"Model name: {cfg['model_name']}\n")

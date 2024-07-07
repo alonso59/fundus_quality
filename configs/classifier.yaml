@@ -1,26 +1,26 @@
-model_name: 'vgg19' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
+model_name: 'drnetq' # drnetq, inceptionv3, inceptionv4, resnet18, resnet152, vgg13, vgg19, swin_custom, swin_tiny, nat_mini, nat_custom
 
 paths:
-  train_imgdir: 'datasets/classification/d1/train'
-  val_imgdir: 'datasets/classification/d1/val'
-  test_imgdir: 'datasets/classification/d1/test'
+  train_imgdir: 'datasets/classification/D2/train'
+  val_imgdir: 'datasets/classification/D2/val'
+  test_imgdir: '/home/alonso/Documents/fundus_suitable/datasets/classification/D2/test'
 
 hyperparameters:
   loss_fn: 'cross_entropy'
-  optimizer: 'adam' # sgd
-  batch_size: 32
-  num_epochs: 300
-  lr: 0.001
+  optimizer: 'sgd' # sgd
+  batch_size: 512
+  num_epochs: 100
+  lr: 0.0001
   b1: 0.8
-  b2: 0.999
-  weight_decay: 0.00001
+  b2: 0.9
+  weight_decay: 0.0005
   scheduler: 
     type: 'step' # cosine, exponential
     gamma: 0.8
-    step: 30
-  n_gpus: 2
+    step: 20
+  n_gpus: 1
 
 general:
-  pretrain: True
+  pretrain: False
   n_classes: 2
-  img_size: 224
+  img_size: 256

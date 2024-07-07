@@ -44,10 +44,10 @@ def predict(model, image, device):
     pred = torch.softmax(pred, dim=1)
     y_pr = torch.max(pred).detach().cpu().numpy()
     pred = torch.argmax(pred).detach().cpu().numpy()
-    
     return pred, y_pr
 
 def main():
+    path = 'logs/classification/classification_2022-06-20_16_49_34'
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', help='Source read image path', required=True)
     # parser.add_argument('-c', help='CSV File', required=True)

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from common.summary import summary
-from .networks import drnetq, swin_transformer, NAT 
+from .networks import drnetq, swin_transformer #, NAT 
 from timm.models.inception_v4 import inception_v4
 import timm
 import sys
@@ -88,7 +88,7 @@ class ClassificationModels(nn.Module):
 
     def DRNetq(self):
         model = drnetq.DRNetQ(n_classes=self.n_classes)  # create object model
-        layer_target = [model.layers.maxpool5]
+        layer_target = [model.layers.relu8]
         self.is_inception = False 
         return model.to(self.device), layer_target
     

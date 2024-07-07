@@ -1,45 +1,67 @@
-model_name: 'swin_unet_custom' #unet, unet_imagenet, swin_unet, swin_unet_custom
+# unet, ce_net, MGU_Net, R2U_Net, y_net, 
+# unet_monai, unet_imagenet, swin_unet, swin_unet_custom, swinUNETR, basicunet_monai, 
+# relaynet
+model_name: unet
 
-unet_encoder: 'resnet18'
+unet_encoder: resnet34
+activation_unet: "LeakyReLU"
+
+unet_monai_architecture:
+  feature_start: 16
+  layers: 4
+  dropout: 0.0
+  kernel_size: 3
+  num_res_units: 2
+  norm: batch
+
+unet_architecutre:
+  bilinear: False
+  dropout: 0.0
+  feature_start: 16
+  kernel_size: 3
+  layers: 4
+  padding: 1
+  stride: 1
 
 swin_unet_custom_architecture:
   embed_dim: 24
   depths: [2, 2, 2, 2]
-  num_heads: [2, 2, 2, 2]
-  window_size: 7
+  num_heads: [2, 4, 8, 16]
+  window_size: 8
   drop_path_rate: 0.1
 
-unet_architecutre:
-  feature_start: 64
-  layers: 4
-  bilinear: False
-  dropout: 0.0
-  kernel_size: 3
-  stride: 1
-  padding: 1
-
 paths:
-  train_imgdir: 'dataset/dataset_roi2/train_images'
-  train_mskdir: 'dataset/dataset_roi2/train_masks'
-  val_imgdir: 'dataset/dataset_roi2/val_images'
-  val_mskdir: 'dataset/dataset_roi2/val_masks'
+  data_base: datasets/dataset/
+  train_imgdir: Images 
+  train_mskdir: Masks 
+  val_imgdir: Images
+  val_mskdir: Masks
+  test_imgdir: Images
+  test_mskdir: Masks
 
 hyperparameters:
-  loss_fn: 'binary_crossentropy'
-  optimizer: 'sgd' # sgd
-  batch_size: 64
-  num_epochs: 50
+  loss_fn: bce #wce_dice, dice_loss, dice_focal_loss, ce, log_cosh_dice
+  optimizer: adam # sgd, adam
+  batch_size: 128
+  num_epochs: 100
   lr: 0.001
   b1: 0.9
   b2: 0.999
-  weight_decay: 0.0001
-  scheduler: 
-    type: 'step' # cosine, exponential
+  weight_decay: 0.00004
+  scheduler:
+    type: step # step, cosine, exponential
     gamma: 0.8
-    step: 5
+    step: 30
   n_gpus: 1
 
 general:
+  device: 'cuda' # 'cpu'
   pretrain: False
+  checkpoint: False
+  init_weights: logs/unet_07_05_07_01_11/checkpoints/weights.pth
   n_classes: 1
-  img_size: 224
+  classes: ['roi']
+  img_sizeh: 256
+  img_sizew: 256
+  channels: 1
+  img_type: large

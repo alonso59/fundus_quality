@@ -87,7 +87,7 @@ def trainer(num_epochs,
     print('Finishing train....')
     load_best_model = torch.load(checkpoint_path + 'model.pth')
     # tb_save_images_figures(model, img_sample[pick0, :, :, :].float().to(device), writer, 0, device, layer)
-    tb_save_CM_roc_auc(model, val_loader, writer, device)
+    tb_save_CM_roc_auc(load_best_model, val_loader, writer, device)
     
 
 
@@ -166,9 +166,9 @@ def eval(model, loader, loss_fn, device):
     model.eval()
     acc = Accuracy()
     with torch.no_grad():
-        for batch_idx, (x, y) in enumerate(loop):
-            x = x.type(torch.float).to(device)
-            y = y.type(torch.long).to(device)
+        for batch_idx, data in enumerate(loop):
+            x = data[0]['image'].type(torch.float).to(device)
+            y = data[1].type(torch.long).to(device)
             y_pred = model(x)
             loss = loss_fn(y_pred, y)
             m0 = acc(y_pred.detach().cpu(), y.detach().cpu())
@@ -193,9 +193,9 @@ def tb_save_CM_roc_auc(net, loader, writer, device):
     y_true = []  # save ground truth
     loop = tqdm(loader, ncols=120)
     print('Saving confusion matrix example in TensorBoard....')
-    for _, (inputs, labels) in enumerate(loop):
-        inputs = inputs.type(torch.float).to(device)
-        labels = labels.type(torch.long).to(device)
+    for batch_idx, data in enumerate(loop):
+        inputs = data[0]['image'].type(torch.float).to(device)
+        labels = data[1].type(torch.long).to(device)
         output = net(inputs)  # Feed Network
         output = (torch.max(torch.exp(output), 1)[1]).data.cpu().numpy()
         y_pred.extend(output)  # save prediction

@@ -19,3 +19,10 @@ datasets/PulbicDatasets/*
 datasets/segmentation/*
 datasets/classification/*
 outputs/*
+!work/Makefile
+!work/list.f
+!work/*.log
+work/*
+*.out
+datasets/
+log*/
