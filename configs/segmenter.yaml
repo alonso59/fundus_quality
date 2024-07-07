@@ -61,6 +61,7 @@ general:
   init_weights: logs/unet_07_05_07_01_11/checkpoints/weights.pth
   n_classes: 1
   classes: ['roi']
+  img_size: 256
   img_sizeh: 256
   img_sizew: 256
   channels: 1

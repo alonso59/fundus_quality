@@ -79,7 +79,7 @@ def remove_remaining(prediction):
 def implement(source, config, weights, img_size, n_classes, device):
     dict_weights = torch.load(weights, map_location=device)
     """ Building model """
-    models_class = SegmentationModels(device, in_channels=1, img_size=img_size, config_file=config, n_classes=n_classes)
+    models_class = SegmentationModels(device, in_channels=1, img_sizeh=img_size, img_sizew=img_size, config_file=config, n_classes=n_classes)
     model, name_model = models_class.UNet(feature_start=32, layers=3, kernel_size=3, stride=1, padding=1)
     model.load_state_dict(dict_weights, strict=True)
     pred = predict(model, source, img_size)

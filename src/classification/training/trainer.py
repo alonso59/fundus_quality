@@ -95,7 +95,7 @@ def train(loader, model, writer, optimizer, loss_fn, iter_num, device, is_incept
     train_loss = 0.0
     train_iou = 0.0
     loop = tqdm(loader, ncols=120)
-    acc = Accuracy()
+    acc = Accuracy(task='multiclass', num_classes=5)
     model.train()
     for batch_idx, data  in enumerate(loop):
         x = data[0]['image'].type(torch.float).to(device)
@@ -139,7 +139,7 @@ def validation(model, loader, loss_fn, writer, iter_val, device):
     valid_iou = 0.0
     loop = tqdm(loader, ncols=120)
     model.eval()
-    acc = Accuracy()
+    acc = Accuracy(task='multiclass', num_classes=5)
     with torch.no_grad():
         for batch_idx, data in enumerate(loop):
             x = data[0]['image'].type(torch.float).to(device)
@@ -164,7 +164,7 @@ def eval(model, loader, loss_fn, device):
     eval_loss = 0.0
     loop = tqdm(loader, ncols=120)
     model.eval()
-    acc = Accuracy()
+    acc = Accuracy(task='multiclass', num_classes=5)
     with torch.no_grad():
         for batch_idx, data in enumerate(loop):
             x = data[0]['image'].type(torch.float).to(device)

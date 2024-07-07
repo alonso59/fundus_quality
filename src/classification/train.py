@@ -33,7 +33,7 @@ def train(cfg):
     General settings
     """
     n_classes = general['n_classes']
-    img_size = general['img_size']
+    img_size = general['img_sizeh']
     pretrain = general['pretrain']
     name_model = cfg['model_name']
     device = torch.device("cuda")
@@ -60,7 +60,7 @@ def train(cfg):
         raise AssertionError('Optimizer not implemented')
 
     assert hyper['loss_fn'] == 'cross_entropy', "Loss function not implemented"
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([0.87099312, 1.06083832, 0.60340599, 1.51418803, 1.69045802], device=device))
     scheduler = StepLR(optimizer=optimizer, step_size=cfg['hyperparameters']['scheduler']['step'], gamma=cfg['hyperparameters']['scheduler']['gamma'])
     logger.info(f'Total_params:{pytorch_total_params}')
     """ 

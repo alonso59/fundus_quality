@@ -3,7 +3,6 @@ import torch.nn as nn
 import torchvision.models as models
 from common.summary import summary
 from .networks import drnetq, swin_transformer #, NAT 
-from timm.models.inception_v4 import inception_v4
 import timm
 import sys
 class ClassificationModels(nn.Module):
@@ -25,6 +24,8 @@ class ClassificationModels(nn.Module):
             self.is_inception = True
         if model_name == 'inceptionv4':
             self.model, self.layer_target = self.incepv4()
+        if model_name == 'efficientnet':
+            self.model, self.layer_target = self.efficientnetb0()
         if model_name == 'resnet18':
             self.model, self.layer_target = self.resnet18()
         if model_name == 'resnet152':
@@ -54,6 +55,20 @@ class ClassificationModels(nn.Module):
         model.fc = nn.Linear(num_ftrs, self.n_classes)
         return model.to(self.device), layer_target
 
+    def efficientnetb0(self):
+        # print(timm.models.list_models())
+        # exit()
+        model = timm.models.create_model('efficientnet_b0', pretrained=True, num_classes=self.n_classes)
+        layer_target = [model.conv_head] # efficientnet_b1
+        model.classifier = nn.Linear(1280, 1024)
+        model = torch.nn.Sequential(model, nn.Dropout(p=0.5), nn.Linear(1024, self.n_classes))
+        # print(model)
+        # exit()
+        # layer_target = [model.stages[-1].blocks[-1][-1].cpe2] # DaViT
+        # layer_target = [model.stages[-1].blocks[-1].attn] # coatnet
+        
+        return model.to(self.device), layer_target
+    
     def incepv4(self):
         model = timm.models.create_model('inception_resnet_v2', pretrained=True, num_classes=self.n_classes)
         # print(model)
@@ -61,7 +76,7 @@ class ClassificationModels(nn.Module):
         # print(model)
         layer_target = [model.conv2d_7b]
         return model.to(self.device), layer_target
-
+    
     def resnet18(self):      
         model = models.resnet18(pretrained=self.pretrain)
         layer_target = [model.layer4[-1]]

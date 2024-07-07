@@ -27,8 +27,8 @@ def main():
 
 
 
-    python src/main.py --stage  impl    --source    dataset/images/
-                                                    dataset/images/input.jpg
+    python src/main.py --stage impl --source dataset/images/
+                                              dataset/images/input.jpg
     """
 
     parser = argparse.ArgumentParser()
@@ -105,7 +105,7 @@ def implement(source, save_results=True):
         crop1, pred_crop = Image.fromarray(crop), Image.fromarray(pred_crop)
 
         if save_results:
-            crop1.save('outputs/preprocessing1/' + os.path.split(i)[1])
+            crop1.save('outputs/preprocessing4/' + os.path.split(i)[1])
         
         crop1 = crop1.resize((224, 224))
         
@@ -155,7 +155,7 @@ def implement(source, save_results=True):
                 thickness,
                 lineType)
             pred_copy = Image.fromarray(pred_copy)
-            pred_copy.save('outputs/detection1/' + os.path.split(i)[1])
+            pred_copy.save('outputs/detection4/' + os.path.split(i)[1])
         
         
         filename.append(os.path.split(i)[1])

@@ -1,5 +1,4 @@
 import os
-from tkinter.messagebox import NO
 import torch
 import shutil
 import random
